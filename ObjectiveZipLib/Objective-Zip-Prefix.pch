@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'ObjectiveZipLib' target in the 'ObjectiveZipLib' project
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+#endif
