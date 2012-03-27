@@ -56,6 +56,10 @@
 	[super dealloc];
 }
 
+- (NSString *) description {
+    return [NSString stringWithFormat:@"<FileInZip: name=%@,length=%u,compLevel=%d,crypted=%d,size=%u>",_name,_length,_level,_crypted,_size];
+}
+
 @synthesize name= _name;
 @synthesize length= _length;
 @synthesize level= _level;
