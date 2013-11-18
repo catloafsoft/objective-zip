@@ -57,7 +57,7 @@
 }
 
 - (NSString *) description {
-    return [NSString stringWithFormat:@"<FileInZip: name=%@,length=%u,compLevel=%d,crypted=%d,size=%u>",_name,_length,_level,_crypted,_size];
+    return [NSString stringWithFormat:@"<FileInZip: name=%@,length=%lu,compLevel=%d,crypted=%d,size=%lu>",_name,(unsigned long)_length,_level,_crypted,(unsigned long)_size];
 }
 
 @synthesize name= _name;
