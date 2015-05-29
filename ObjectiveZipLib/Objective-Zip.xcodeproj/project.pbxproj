@@ -26,6 +26,8 @@
 		EAA4E3F414FD58920025B561 /* ZipReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3E214FD58920025B561 /* ZipReadStream.m */; };
 		EAA4E3F514FD58920025B561 /* ZipWriteStream.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3E314FD58920025B561 /* ZipWriteStream.h */; };
 		EAA4E3F614FD58920025B561 /* ZipWriteStream.m in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3E414FD58920025B561 /* ZipWriteStream.m */; };
+		ED4430A91B18CFDF007A3256 /* ZipWithProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */; };
+		ED4430AA1B18CFDF007A3256 /* ZipWithProgress.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED4430A81B18CFDF007A3256 /* ZipWithProgress.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +52,8 @@
 		EAA4E3E214FD58920025B561 /* ZipReadStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipReadStream.m; sourceTree = "<group>"; };
 		EAA4E3E314FD58920025B561 /* ZipWriteStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipWriteStream.h; sourceTree = "<group>"; };
 		EAA4E3E414FD58920025B561 /* ZipWriteStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipWriteStream.m; sourceTree = "<group>"; };
+		ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipWithProgress.h; sourceTree = "<group>"; };
+		ED4430A81B18CFDF007A3256 /* ZipWithProgress.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ZipWithProgress.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +130,8 @@
 				EAA4E3E014FD58920025B561 /* ZipFile.m */,
 				EAA4E3E114FD58920025B561 /* ZipReadStream.h */,
 				EAA4E3E214FD58920025B561 /* ZipReadStream.m */,
+				ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */,
+				ED4430A81B18CFDF007A3256 /* ZipWithProgress.mm */,
 				EAA4E3E314FD58920025B561 /* ZipWriteStream.h */,
 				EAA4E3E414FD58920025B561 /* ZipWriteStream.m */,
 			);
@@ -148,6 +154,7 @@
 				EAA4E3F114FD58920025B561 /* ZipFile.h in Headers */,
 				EAA4E3F314FD58920025B561 /* ZipReadStream.h in Headers */,
 				EAA4E3F514FD58920025B561 /* ZipWriteStream.h in Headers */,
+				ED4430A91B18CFDF007A3256 /* ZipWithProgress.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,6 +213,7 @@
 				EAA4E3E714FD58920025B561 /* mztools.c in Sources */,
 				EAA4E3E914FD58920025B561 /* unzip.c in Sources */,
 				EAA4E3EB14FD58920025B561 /* zip.c in Sources */,
+				ED4430AA1B18CFDF007A3256 /* ZipWithProgress.mm in Sources */,
 				EAA4E3EE14FD58920025B561 /* FileInZipInfo.m in Sources */,
 				EAA4E3F014FD58920025B561 /* ZipException.m in Sources */,
 				EAA4E3F214FD58920025B561 /* ZipFile.m in Sources */,
