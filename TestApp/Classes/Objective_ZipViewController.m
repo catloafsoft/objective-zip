@@ -108,7 +108,7 @@
 			
 			NSArray *infos= [unzipFile listFileInZipInfos];
 			for (FileInZipInfo *info in infos) {
-				NSString *fileInfo= [NSString stringWithFormat:@"- %@ %@ %d (%d)", info.name, info.date, info.size, info.level];
+				NSString *fileInfo= [NSString stringWithFormat:@"- %@ %@ %lu (%d)", info.name, info.date, (unsigned long)info.size, info.level];
 				[self performSelectorOnMainThread:@selector(log:) withObject:fileInfo waitUntilDone:YES];
 			}
 			
@@ -171,7 +171,7 @@
 		} @catch (ZipException *ze) {
 			[self performSelectorOnMainThread:@selector(log:) withObject:@"Caught a ZipException (see logs), terminating..." waitUntilDone:YES];
 			
-			NSLog(@"ZipException caught: %d - %@", ze.error, [ze reason]);
+			NSLog(@"ZipException caught: %ld - %@", (long)ze.error, [ze reason]);
 
 		} @catch (id e) {
 			[self performSelectorOnMainThread:@selector(log:) withObject:@"Caught a generic exception (see logs), terminating..." waitUntilDone:YES];
