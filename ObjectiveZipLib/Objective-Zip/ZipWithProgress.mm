@@ -50,9 +50,8 @@
    if (![self insureNoDuplicates]) return NO;
    if (![self insureSourceFilesExist]) return NO;
    if ([self totalSourceFileSize] == 0) return NO;
-   if (![self insureAdequateDiskSpace] == 0) return NO;
+   if (![self insureAdequateDiskSpace]) return NO;
    if (![self insureCanCreateZipFileAtLocation]) return NO;
-   
    return YES;
 }
 
@@ -130,12 +129,12 @@
 
 - (BOOL) insureAdequateDiskSpace
 {
-   return NO;
+   return YES;
 }
 
 - (BOOL) insureCanCreateZipFileAtLocation
 {
-   return NO;
+   return YES;
 }
 
 @end
