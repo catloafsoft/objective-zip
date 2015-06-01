@@ -202,7 +202,7 @@
    NSFileHandle * handle = [NSFileHandle fileHandleForWritingToURL:fullUrl  error:&error];
    if (handle == nil || error != nil)
    {
-      if (_zipDelegate) [_zipDelegate updateEror:error];
+      [_zipDelegate updateEror:error];
       return;
    }
    
@@ -228,6 +228,9 @@
    {
       do
       {
+         if (bytesToRead > (info.size - totalBytesWritten))
+            bytesToRead = info.size - totalBytesWritten;
+         
          NSData * data = [readStream readDataOfLength:bytesToRead];
          [handle writeData:data];
          totalBytesWritten += data.length;
