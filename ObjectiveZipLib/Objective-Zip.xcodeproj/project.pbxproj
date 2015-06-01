@@ -43,12 +43,12 @@
 		ED4430BB1B191090007A3256 /* mztools.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3D614FD58920025B561 /* mztools.h */; };
 		ED4430BC1B191090007A3256 /* unzip.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3D814FD58920025B561 /* unzip.h */; };
 		ED4430BD1B191090007A3256 /* zip.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DA14FD58920025B561 /* zip.h */; };
-		ED4430BE1B191090007A3256 /* FileInZipInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DB14FD58920025B561 /* FileInZipInfo.h */; };
-		ED4430BF1B191090007A3256 /* ZipException.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DD14FD58920025B561 /* ZipException.h */; };
-		ED4430C01B191090007A3256 /* ZipFile.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DF14FD58920025B561 /* ZipFile.h */; };
-		ED4430C11B191090007A3256 /* ZipReadStream.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3E114FD58920025B561 /* ZipReadStream.h */; };
-		ED4430C21B191090007A3256 /* ZipWriteStream.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3E314FD58920025B561 /* ZipWriteStream.h */; };
-		ED4430C31B191090007A3256 /* ZipWithProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */; };
+		ED4430BE1B191090007A3256 /* FileInZipInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DB14FD58920025B561 /* FileInZipInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ED4430BF1B191090007A3256 /* ZipException.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DD14FD58920025B561 /* ZipException.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ED4430C01B191090007A3256 /* ZipFile.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DF14FD58920025B561 /* ZipFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ED4430C11B191090007A3256 /* ZipReadStream.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3E114FD58920025B561 /* ZipReadStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ED4430C21B191090007A3256 /* ZipWriteStream.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3E314FD58920025B561 /* ZipWriteStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ED4430C31B191090007A3256 /* ZipWithProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -193,16 +193,16 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED4430BA1B191090007A3256 /* ioapi.h in Headers */,
-				ED4430BB1B191090007A3256 /* mztools.h in Headers */,
-				ED4430BC1B191090007A3256 /* unzip.h in Headers */,
-				ED4430BD1B191090007A3256 /* zip.h in Headers */,
 				ED4430BE1B191090007A3256 /* FileInZipInfo.h in Headers */,
 				ED4430BF1B191090007A3256 /* ZipException.h in Headers */,
 				ED4430C01B191090007A3256 /* ZipFile.h in Headers */,
 				ED4430C11B191090007A3256 /* ZipReadStream.h in Headers */,
 				ED4430C21B191090007A3256 /* ZipWriteStream.h in Headers */,
 				ED4430C31B191090007A3256 /* ZipWithProgress.h in Headers */,
+				ED4430BA1B191090007A3256 /* ioapi.h in Headers */,
+				ED4430BB1B191090007A3256 /* mztools.h in Headers */,
+				ED4430BC1B191090007A3256 /* unzip.h in Headers */,
+				ED4430BD1B191090007A3256 /* zip.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -320,6 +320,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PUBLIC_HEADERS_FOLDER_PATH = "Objective-Zip";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -357,7 +359,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
+				PUBLIC_HEADERS_FOLDER_PATH = "Objective-Zip";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -374,6 +378,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PUBLIC_HEADERS_FOLDER_PATH = "Objective-Zip";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
