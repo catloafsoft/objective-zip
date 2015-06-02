@@ -75,10 +75,13 @@
          [_zipDelegate  updateCurrentFile:info.name];
       
       ZipReadStream * readStream = [_zipFile readCurrentFileInZip];
+      
       [self extractStream:readStream
                  toFolder:unzipToFolder
                  withInfo:info
            singleFileOnly:NO];
+      
+      [readStream finishedReading];
       
    } while ([_zipFile goToNextFileInZip]);
 }
@@ -122,6 +125,8 @@
                  toFolder:unzipToFolder
                  withInfo:fileInfo
            singleFileOnly:YES];
+      
+      [readStream finishedReading];
    }
 }
 
@@ -229,7 +234,6 @@
    {
       // zipfile contains a file with 0 byte length?
       // should we write out the file anyways?
-      [readStream finishedReading];
       [handle closeFile];
       return result;
    }
@@ -298,7 +302,6 @@
       NSLog(@"Exception caught: %@ - %@", [[e class] description], [e description]);
    }
    
-   [readStream finishedReading];
    [handle closeFile];
    
    return result;

@@ -16,8 +16,6 @@
 		EAA4E3BF14FD56B70025B561 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAA4E3BE14FD56B70025B561 /* Foundation.framework */; };
 		EAA4E3E514FD58920025B561 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D314FD58920025B561 /* ioapi.c */; };
 		EAA4E3E614FD58920025B561 /* ioapi.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3D414FD58920025B561 /* ioapi.h */; };
-		EAA4E3E714FD58920025B561 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D514FD58920025B561 /* mztools.c */; };
-		EAA4E3E814FD58920025B561 /* mztools.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3D614FD58920025B561 /* mztools.h */; };
 		EAA4E3E914FD58920025B561 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D714FD58920025B561 /* unzip.c */; };
 		EAA4E3EA14FD58920025B561 /* unzip.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3D814FD58920025B561 /* unzip.h */; };
 		EAA4E3EB14FD58920025B561 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D914FD58920025B561 /* zip.c */; };
@@ -35,7 +33,6 @@
 		ED4430A91B18CFDF007A3256 /* ZipWithProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ED4430AA1B18CFDF007A3256 /* ZipWithProgress.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED4430A81B18CFDF007A3256 /* ZipWithProgress.mm */; };
 		ED4430AD1B191090007A3256 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D314FD58920025B561 /* ioapi.c */; };
-		ED4430AE1B191090007A3256 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D514FD58920025B561 /* mztools.c */; };
 		ED4430AF1B191090007A3256 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D714FD58920025B561 /* unzip.c */; };
 		ED4430B01B191090007A3256 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D914FD58920025B561 /* zip.c */; };
 		ED4430B11B191090007A3256 /* ZipWithProgress.mm in Sources */ = {isa = PBXBuildFile; fileRef = ED4430A81B18CFDF007A3256 /* ZipWithProgress.mm */; };
@@ -46,7 +43,6 @@
 		ED4430B61B191090007A3256 /* ZipWriteStream.m in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3E414FD58920025B561 /* ZipWriteStream.m */; };
 		ED4430B81B191090007A3256 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAA4E3BE14FD56B70025B561 /* Foundation.framework */; };
 		ED4430BA1B191090007A3256 /* ioapi.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3D414FD58920025B561 /* ioapi.h */; };
-		ED4430BB1B191090007A3256 /* mztools.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3D614FD58920025B561 /* mztools.h */; };
 		ED4430BC1B191090007A3256 /* unzip.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3D814FD58920025B561 /* unzip.h */; };
 		ED4430BD1B191090007A3256 /* zip.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DA14FD58920025B561 /* zip.h */; };
 		ED4430BE1B191090007A3256 /* FileInZipInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DB14FD58920025B561 /* FileInZipInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -66,8 +62,6 @@
 		EAA4E3C214FD56B70025B561 /* Objective-Zip-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Objective-Zip-Prefix.pch"; sourceTree = "<group>"; };
 		EAA4E3D314FD58920025B561 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
 		EAA4E3D414FD58920025B561 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
-		EAA4E3D514FD58920025B561 /* mztools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mztools.c; sourceTree = "<group>"; };
-		EAA4E3D614FD58920025B561 /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
 		EAA4E3D714FD58920025B561 /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
 		EAA4E3D814FD58920025B561 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
 		EAA4E3D914FD58920025B561 /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zip.c; sourceTree = "<group>"; };
@@ -149,8 +143,6 @@
 			children = (
 				EAA4E3D314FD58920025B561 /* ioapi.c */,
 				EAA4E3D414FD58920025B561 /* ioapi.h */,
-				EAA4E3D514FD58920025B561 /* mztools.c */,
-				EAA4E3D614FD58920025B561 /* mztools.h */,
 				EAA4E3D714FD58920025B561 /* unzip.c */,
 				EAA4E3D814FD58920025B561 /* unzip.h */,
 				EAA4E3D914FD58920025B561 /* zip.c */,
@@ -189,7 +181,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAA4E3E614FD58920025B561 /* ioapi.h in Headers */,
-				EAA4E3E814FD58920025B561 /* mztools.h in Headers */,
 				EAA4E3EA14FD58920025B561 /* unzip.h in Headers */,
 				03510FDD1B1CB4CE007EA388 /* UnzipWithProgress.h in Headers */,
 				03510FE21B1CB578007EA388 /* ProgressDelegate.h in Headers */,
@@ -216,7 +207,6 @@
 				ED4430C21B191090007A3256 /* ZipWriteStream.h in Headers */,
 				ED4430C31B191090007A3256 /* ZipWithProgress.h in Headers */,
 				ED4430BA1B191090007A3256 /* ioapi.h in Headers */,
-				ED4430BB1B191090007A3256 /* mztools.h in Headers */,
 				ED4430BC1B191090007A3256 /* unzip.h in Headers */,
 				ED4430BD1B191090007A3256 /* zip.h in Headers */,
 			);
@@ -292,7 +282,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAA4E3E514FD58920025B561 /* ioapi.c in Sources */,
-				EAA4E3E714FD58920025B561 /* mztools.c in Sources */,
 				EAA4E3E914FD58920025B561 /* unzip.c in Sources */,
 				EAA4E3EB14FD58920025B561 /* zip.c in Sources */,
 				ED4430AA1B18CFDF007A3256 /* ZipWithProgress.mm in Sources */,
@@ -310,7 +299,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				ED4430AD1B191090007A3256 /* ioapi.c in Sources */,
-				ED4430AE1B191090007A3256 /* mztools.c in Sources */,
 				ED4430AF1B191090007A3256 /* unzip.c in Sources */,
 				ED4430B01B191090007A3256 /* zip.c in Sources */,
 				ED4430B11B191090007A3256 /* ZipWithProgress.mm in Sources */,

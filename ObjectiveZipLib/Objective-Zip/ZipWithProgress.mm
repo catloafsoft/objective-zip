@@ -78,10 +78,12 @@
          [self writeStream:writeStream
                   fromFile:[NSURL fileURLWithPath:sourceFileName]
             singleFileOnly:NO];
+         
+         [writeStream finishedWriting];
       }
       else
       {
-         // TODO:LEA: close andclean up the zipfile??
+         // TODO:LEA: close and clean up the zipfile??
          if (_zipDelegate)
          {
             NSString * message = @"Failed to create write stream for zip file";
@@ -151,9 +153,14 @@
    for( ; it != _zipFileMapping.end(); ++it)
    {
       if (it->first.length() <= 0) return NO;
+      
+      NSError * error = nil;
       NSString * sourceFileName = [NSString stringWithUTF8String:it->first.c_str()];
-      NSData * data = [NSData dataWithContentsOfFile:sourceFileName];
-      if (data == nil) return NO;
+      NSFileHandle * handle =
+         [NSFileHandle fileHandleForReadingFromURL:[NSURL fileURLWithPath:sourceFileName]
+                                             error:&error];
+      [handle closeFile];
+      if (handle == nil || error != nil) return NO;
    }
    
    return YES;
@@ -220,7 +227,6 @@
                     ofSize:1
             singleFileOnly:singleFileOnly];
       
-      [writeStream finishedWriting];
       return YES;
    }
    
@@ -299,7 +305,6 @@
       NSLog(@"Exception caught: %@ - %@", [[e class] description], [e description]);
    }
    
-   [writeStream finishedWriting];
    return result;
 }
 
