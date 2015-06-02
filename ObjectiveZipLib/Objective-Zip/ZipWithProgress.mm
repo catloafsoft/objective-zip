@@ -193,16 +193,19 @@
 }
 
 
-- (void) writeStream:(ZipWriteStream *) writeStream
-            fromFile:(NSURL *) fileToZip
-      singleFileOnly:(BOOL) singleFileOnly
+- (BOOL) writeStream:(ZipWriteStream *) writeStream
+               fromFile:(NSURL *) fileToZip
+         singleFileOnly:(BOOL) singleFileOnly
 {
+   // TODO:LEA:track if there is an exception or error and clean up after it
+   BOOL result = NO;
+   
    NSError * error = nil;
    NSFileHandle * handle = [NSFileHandle fileHandleForReadingFromURL:fileToZip  error:&error];
    if (handle == nil || error != nil)
    {
       [_zipDelegate updateEror:error];
-      return;
+      return result;
    }
    
    unsigned long long bytesInFile = [handle seekToEndOfFile];
@@ -210,13 +213,15 @@
    
    if (bytesInFile == 0)
    {
+      // writing out file with no bytes???
+      // should we allow this???
       [self updateProgress:1
                    forFile:fileToZip
                     ofSize:1
             singleFileOnly:singleFileOnly];
       
       [writeStream finishedWriting];
-      return;
+      return YES;
    }
    
    unsigned long long totalBytesWritten = 0;
@@ -227,9 +232,9 @@
                  ofSize:bytesInFile
          singleFileOnly:singleFileOnly];
    
-   // TODO:LEA:track if there is an exception or error and clean up after it
    @try
    {
+      result = YES;
       do
       {
          if (bytesToRead > (bytesInFile - totalBytesWritten))
@@ -239,7 +244,8 @@
          if (data && data.length == bytesToRead)
          {
             [writeStream writeData:data];
-            
+            totalBytesWritten += bytesToRead;
+
             [self updateProgress:totalBytesWritten
                          forFile:fileToZip
                           ofSize:bytesInFile
@@ -248,6 +254,9 @@
          else
          {
             // TODO:LEA: report error and delete the archive
+            NSLog(@"Failed to write entire file bytesToRead = %lu, data.length = %lu",
+                  bytesToRead, data.length);
+            result = NO;
             break;
          }
          
@@ -291,6 +300,7 @@
    }
    
    [writeStream finishedWriting];
+   return result;
 }
 
 
