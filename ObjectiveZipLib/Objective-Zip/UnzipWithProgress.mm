@@ -191,19 +191,36 @@
    [_zipDelegate updateProgress:progress];
 }
 
-- (void) extractStream:(ZipReadStream *) readStream
+- (BOOL) extractStream:(ZipReadStream *) readStream
               toFolder:(NSURL *) unzipToFolder
               withInfo:(FileInZipInfo *) info
         singleFileOnly:(BOOL) singleFileOnly
 {
+   // TODO:LEA:track if there is an exception or error and clean up after it
+   BOOL result = NO;
+   
    NSURL * fullUrl = [unzipToFolder URLByAppendingPathComponent:info.name];
    
+   // create an empty file - don't overwrite an existing file
    NSError * error = nil;
+   NSData * emptyData = [NSData new];
+   BOOL success = [emptyData writeToURL:fullUrl
+                                options:NSDataWritingWithoutOverwriting
+                                  error:&error];
+   
+   if (success == NO || error != nil)
+   {
+      [_zipDelegate updateEror:error];
+      return result;
+   }
+   
+   // open a file handle for writing to the file
+   error = nil;
    NSFileHandle * handle = [NSFileHandle fileHandleForWritingToURL:fullUrl  error:&error];
    if (handle == nil || error != nil)
    {
       [_zipDelegate updateEror:error];
-      return;
+      return result;
    }
    
    [handle seekToFileOffset:0];
@@ -211,9 +228,10 @@
    if (info.size == 0)
    {
       // zipfile contains a file with 0 byte length?
+      // should we write out the file anyways?
       [readStream finishedReading];
       [handle closeFile];
-      return;
+      return result;
    }
    
    unsigned long long totalBytesWritten = 0;
@@ -223,7 +241,6 @@
             forFileInfo:info
          singleFileOnly:singleFileOnly];
    
-   // TODO:LEA:track if there is an exception or error and clean up after it
    @try
    {
       do
@@ -241,6 +258,8 @@
                singleFileOnly:singleFileOnly];
          
       } while (totalBytesWritten < info.size);
+      
+      result = YES;
    }
    @catch (ZipException *ze)
    {
@@ -281,6 +300,8 @@
    
    [readStream finishedReading];
    [handle closeFile];
+   
+   return result;
 }
 
 
