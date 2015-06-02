@@ -640,7 +640,7 @@ local int unzGoToNextDisk(unzFile file)
 {
     unz64_s* s;
     file_in_zip64_read_info_s* pfile_in_zip_read_info;
-    int number_disk_next;
+    long number_disk_next;
 
     s = (unz64_s*)file;
     if (s == NULL)
@@ -667,8 +667,10 @@ local int unzGoToNextDisk(unzFile file)
         }
         else
         {
-            s->filestream = ZOPENDISK64(s->z_filefunc, s->filestream_with_CD, number_disk_next, 
-                ZLIB_FILEFUNC_MODE_READ | ZLIB_FILEFUNC_MODE_EXISTING);
+           // (int) cast shouldn't be an issue unless we span over more the 4GB of files ;)
+            s->filestream = ZOPENDISK64(s->z_filefunc, s->filestream_with_CD,
+                                        (int)(number_disk_next),
+                                        ZLIB_FILEFUNC_MODE_READ|ZLIB_FILEFUNC_MODE_EXISTING);
         }
 
         if (s->filestream == NULL)
@@ -1385,8 +1387,8 @@ extern int ZEXPORT unzReadCurrentFile(unzFile file, voidp buf, unsigned len)
         if (pfile_in_zip_read_info->stream.avail_in == 0)
         {
             uInt bytes_to_read = UNZ_BUFSIZE;
-            uInt bytes_not_read = 0;
-            uInt bytes_read = 0;
+            long bytes_not_read = 0;
+            long bytes_read = 0;
             uInt total_bytes_read = 0;
 
             if (pfile_in_zip_read_info->stream.next_in != NULL)

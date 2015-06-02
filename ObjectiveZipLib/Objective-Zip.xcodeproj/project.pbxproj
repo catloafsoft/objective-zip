@@ -51,6 +51,8 @@
 		ED4430C11B191090007A3256 /* ZipReadStream.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3E114FD58920025B561 /* ZipReadStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ED4430C21B191090007A3256 /* ZipWriteStream.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3E314FD58920025B561 /* ZipWriteStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ED4430C31B191090007A3256 /* ZipWithProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EDBCB5E41B1E5E4300C41248 /* crypt.h in Headers */ = {isa = PBXBuildFile; fileRef = EDBCB5E31B1E5E4300C41248 /* crypt.h */; };
+		EDBCB5E51B1E5E4300C41248 /* crypt.h in Headers */ = {isa = PBXBuildFile; fileRef = EDBCB5E31B1E5E4300C41248 /* crypt.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -79,6 +81,7 @@
 		ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipWithProgress.h; sourceTree = "<group>"; };
 		ED4430A81B18CFDF007A3256 /* ZipWithProgress.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ZipWithProgress.mm; sourceTree = "<group>"; };
 		ED4430C81B191090007A3256 /* libObjective-Zip-OSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libObjective-Zip-OSX.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EDBCB5E31B1E5E4300C41248 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +144,7 @@
 		EAA4E3D114FD58920025B561 /* MiniZip */ = {
 			isa = PBXGroup;
 			children = (
+				EDBCB5E31B1E5E4300C41248 /* crypt.h */,
 				EAA4E3D314FD58920025B561 /* ioapi.c */,
 				EAA4E3D414FD58920025B561 /* ioapi.h */,
 				EAA4E3D714FD58920025B561 /* unzip.c */,
@@ -183,6 +187,7 @@
 				EAA4E3E614FD58920025B561 /* ioapi.h in Headers */,
 				EAA4E3EA14FD58920025B561 /* unzip.h in Headers */,
 				03510FDD1B1CB4CE007EA388 /* UnzipWithProgress.h in Headers */,
+				EDBCB5E41B1E5E4300C41248 /* crypt.h in Headers */,
 				03510FE21B1CB578007EA388 /* ProgressDelegate.h in Headers */,
 				EAA4E3EC14FD58920025B561 /* zip.h in Headers */,
 				EAA4E3ED14FD58920025B561 /* FileInZipInfo.h in Headers */,
@@ -201,6 +206,7 @@
 				ED4430BE1B191090007A3256 /* FileInZipInfo.h in Headers */,
 				ED4430BF1B191090007A3256 /* ZipException.h in Headers */,
 				ED4430C01B191090007A3256 /* ZipFile.h in Headers */,
+				EDBCB5E51B1E5E4300C41248 /* crypt.h in Headers */,
 				03510FDE1B1CB4CE007EA388 /* UnzipWithProgress.h in Headers */,
 				03510FE31B1CB578007EA388 /* ProgressDelegate.h in Headers */,
 				ED4430C11B191090007A3256 /* ZipReadStream.h in Headers */,
