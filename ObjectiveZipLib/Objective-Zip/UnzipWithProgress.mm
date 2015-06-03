@@ -129,9 +129,9 @@
 
 - (void) unzipToLocation:(NSURL *)unzipToFolder
 {
-   if ([self insureAdequateDiskSpace:unzipToFolder] == NO)  return;
-       
    _totalDestinationBytesWritten = 0;
+   
+   if ([self insureAdequateDiskSpace:unzipToFolder] == NO)  return;
    
    [_zipFile goToFirstFileInZip];
    
@@ -163,7 +163,15 @@
    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
    if (queue)
    {
-      dispatch_async(queue, ^{ [self unzipToLocation:unzipToFolder]; });
+      dispatch_async(queue,
+                     ^{
+                        [self unzipToLocation:unzipToFolder];
+                        [_zipFile close];
+                        _zipFile = nil;
+                        
+                        if (completion) completion(_zipFileError);
+                     });
+      
    }
    else
    {
@@ -173,13 +181,16 @@
                                       userInfo:[NSDictionary
                                                 dictionaryWithObject:message
                                                 forKey:NSLocalizedDescriptionKey]];
-      [_zipDelegate updateError:_zipFileError];
+      [_zipFile close];
+      _zipFile = nil;
+      
+      if (completion)
+         completion(_zipFileError);
+      else
+         [_zipDelegate updateError:_zipFileError];
    }
    
-   [_zipFile close];
-   _zipFile = nil;
-   
-   if (completion) completion(_zipFileError);
+
 }
 
 #pragma mark helpers
@@ -240,7 +251,7 @@
    if (singleFileOnly == NO)
    {
       double totalToSend = self.totalDstinationFileSize;
-      progress = (totalToSend)? bytesReadFromFile / totalToSend : 0;
+      progress = (totalToSend)? _totalDestinationBytesWritten / totalToSend : 0;
    }
    
    [_zipDelegate updateProgress:progress];
