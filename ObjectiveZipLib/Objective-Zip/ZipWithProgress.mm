@@ -320,7 +320,7 @@
    if (singleFileOnly == NO)
    {
       double totalToWrite = self.totalSourceFileSize;
-      progress = (totalToWrite)? bytesReadFromFile / totalToWrite : 0;
+      progress = (totalToWrite)? _totalDestinationBytesWritten / totalToWrite : 0;
    }
    
    [_zipDelegate updateProgress:progress];
