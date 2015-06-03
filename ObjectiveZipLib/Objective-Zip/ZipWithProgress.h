@@ -27,4 +27,6 @@
 
 - (void) createFlatZipFileWithCompletionBlock:(void(^)(NSError * error))completion;
 
+@property (assign, atomic) BOOL cancelZipping;
+
 @end
