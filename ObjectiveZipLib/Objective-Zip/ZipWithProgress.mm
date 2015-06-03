@@ -21,6 +21,7 @@
    id<ProgressDelegate> _zipDelegate;
    ZipFile *            _zipFile;
    
+   NSString *           _createdZipFile;
    unsigned long long   _totalSourceFileSize;
    unsigned long long   _totalDestinationBytesWritten;
    std::map<std::string, std::string> _zipFileMapping;
@@ -34,6 +35,22 @@
 //
 @implementation ZipWithProgress
 
+- (void) createZipFileIfNeeded
+{
+   if (_zipFile == nil)
+   {
+      @try
+      {
+         _zipFile = [[ZipFile alloc] initWithFileName:_zipFilePath mode:ZipFileModeCreate];
+      }
+      @catch (NSException * exception)
+      {
+         [self setErrorCode:10 errorMessage:exception.reason andNotify:YES];
+         _zipFile = nil;   // something failed during initialization
+      }
+   }
+}
+
 - (id) initWithZipFilePath:(NSString *)zipFilePath
                   andArray:(std::map<std::string, std::string>)filesToZip
 {
@@ -41,7 +58,7 @@
    {
       _zipFilePath = zipFilePath;
       _zipFileMapping = filesToZip;
-      _zipFile = [[ZipFile alloc] initWithFileName:_zipFilePath mode:ZipFileModeCreate];
+      [self createZipFileIfNeeded];
       if (_zipFile == nil) return nil;
    }
    
@@ -72,6 +89,18 @@
 {
    _totalDestinationBytesWritten = 0;
    
+   [self createZipFileIfNeeded];
+   if (_zipFile == nil) return;
+   
+   // set the file so it will be cleaned up
+   _createdZipFile = _zipFilePath;
+   
+   if (self.cancelZipping)
+   {
+      [self setCancelErrorAndCleanup];
+      return;
+   }
+   
    if (![self canZipFlatFile]) return;
    
    std::map<std::string, std::string>::iterator it = _zipFileMapping.begin();
@@ -93,18 +122,18 @@
          
          [writeStream finishedWriting];
          
-         if (_zipFileError != nil)
+         if (_zipFileError != nil) break;
+         
+         if (self.cancelZipping)
+         {
+            [self setCancelErrorAndCleanup];
             break;
+         }
       }
       else
       {
          NSString * message = @"Failed to create write stream for zip file";
-         _zipFileError = [NSError errorWithDomain:@"ZipException"
-                                             code:1
-                                         userInfo:[NSDictionary
-                                                   dictionaryWithObject:message
-                                                                 forKey:NSLocalizedDescriptionKey]];
-         [_zipDelegate updateError:_zipFileError];
+         [self setErrorCode:1 errorMessage:message andNotify:YES];
          break;
       }
    }
@@ -112,8 +141,7 @@
 
 - (void) createFlatZipFileWithCompletionBlock:(void(^)(NSError * error))completion
 {
-   if (_zipFile == nil)
-      _zipFile = [[ZipFile alloc] initWithFileName:_zipFilePath mode:ZipFileModeUnzip];
+   self.cancelZipping = NO;
    
    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
    if (queue)
@@ -130,25 +158,62 @@
    }
    else
    {
-      NSString * message = @"Failed to get a system queue to execute zip file creation";
-      _zipFileError = [NSError errorWithDomain:@"ZipException"
-                                          code:2
-                                      userInfo:[NSDictionary
-                                                dictionaryWithObject:message
-                                                forKey:NSLocalizedDescriptionKey]];
       [_zipFile close];
       _zipFile = nil;
       
-      if (completion)
-         completion(_zipFileError);
-      else
-         [_zipDelegate updateError:_zipFileError];
+      NSString * message = @"Failed to get a system queue to execute zip file creation";
+      [self setErrorCode:2 errorMessage:message andNotify:((completion)? NO : YES)];
+      
+      if (completion) completion(_zipFileError);
    }
-   
-
 }
 
 #pragma mark helpers
+
+- (void) setError:(NSError *)error andNotify:(BOOL)notify
+{
+   if (error)
+   {
+      _zipFileError = error;
+      if (notify) [_zipDelegate updateError:_zipFileError];
+   }
+}
+
+- (void) setErrorCode:(NSInteger)code errorMessage:(NSString *)message andNotify:(BOOL)notify
+{
+   if (message == nil) message = @"Unknown failure";
+   
+   [self setError:[NSError errorWithDomain:@"ZipException"
+                                       code:code
+                                   userInfo:[NSDictionary
+                                                dictionaryWithObject:message
+                                                              forKey:NSLocalizedDescriptionKey]]
+        andNotify:notify];
+}
+
+- (void) performFileCleanup
+{
+   if (_createdZipFile)
+   {
+      NSError * error = nil;
+      BOOL result = [[NSFileManager defaultManager] removeItemAtPath:_createdZipFile error:&error];
+      if (result == NO || error != nil)
+         [self setError:error andNotify:YES];
+   }
+}
+
+- (void) setCancelError
+{
+   NSString * message = @"User cancelled error";
+   [self setErrorCode:-128 errorMessage:message andNotify:YES];
+}
+
+- (void) setCancelErrorAndCleanup
+{
+   [self setCancelError];
+   [self performFileCleanup];
+}
+
 - (NSUInteger) totalSourceFileSize
 {
    if (_totalSourceFileSize) return _totalSourceFileSize;
@@ -167,8 +232,7 @@
          if (handle == nil || error != nil)
          {
             _totalSourceFileSize = 0;
-            _zipFileError = error;
-            [_zipDelegate updateError:_zipFileError];
+            [self setError:error andNotify:YES];
             return _totalSourceFileSize;
          }
          
@@ -211,8 +275,7 @@
       
       if (handle == nil || error != nil)
       {
-         _zipFileError = error;
-         [_zipDelegate updateError:_zipFileError];
+         [self setError:error andNotify:YES];
          return NO;
       }
    }
@@ -274,8 +337,7 @@
    NSFileHandle * handle = [NSFileHandle fileHandleForReadingFromURL:fileToZip  error:&error];
    if (handle == nil || error != nil)
    {
-      _zipFileError = error;
-      [_zipDelegate updateError:_zipFileError];
+      [self setError:error andNotify:YES];
       return result;
    }
    
@@ -306,6 +368,8 @@
    {
       do
       {
+         if (self.cancelZipping) break;
+         
          if (bytesToRead > (bytesInFile - totalBytesWritten))
             bytesToRead = bytesInFile - totalBytesWritten;
          
@@ -335,28 +399,12 @@
    @catch (ZipException *ze)
    {
       NSString * reason = [ze reason];
-      if (reason == nil)
-         reason = @"Unknown failure";
-      
-      _zipFileError = [NSError errorWithDomain:@"ZipException"
-                                          code:ze.error
-                                      userInfo:[NSDictionary
-                                                dictionaryWithObject:reason
-                                                              forKey:NSLocalizedDescriptionKey]];
-      [_zipDelegate updateError:_zipFileError];
+      [self setErrorCode:ze.error errorMessage:reason andNotify:YES];
    }
    @catch (id e)
    {
       NSString * reason = [e description];
-      if (reason == nil)
-         reason = @"Unknown failure";
-            
-      _zipFileError = [NSError errorWithDomain:@"ZipException"
-                                          code:1
-                                      userInfo:[NSDictionary
-                                                dictionaryWithObject:reason
-                                                              forKey:NSLocalizedDescriptionKey]];
-      [_zipDelegate updateError:_zipFileError];
+      [self setErrorCode:1 errorMessage:reason andNotify:YES];
    }
    
    return result;

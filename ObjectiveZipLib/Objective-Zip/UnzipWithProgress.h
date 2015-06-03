@@ -28,4 +28,6 @@
 - (void) unzipToLocation:(NSURL *)unzipToFolder
      withCompletionBlock:(void(^)(NSError * error))completion;
 
+@property (assign, atomic) BOOL cancelUnzip;
+
 @end
