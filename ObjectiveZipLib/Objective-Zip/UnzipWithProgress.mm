@@ -19,6 +19,7 @@
    NSArray *            _zipRequiredFiles;
    NSString *           _zipFilePath;
    NSURL *              _unzipToFolder;
+   NSError *            _zipFileError;
    ZipFile *            _zipFile;
    
    id<ProgressDelegate> _zipDelegate;
@@ -41,14 +42,35 @@
       _zipFilePath = zipFilePath;
       _zipRequiredFiles = requiredFiles;
       _zipFile = [[ZipFile alloc] initWithFileName:_zipFilePath mode:ZipFileModeUnzip];
+      if (_zipFile == nil) return nil;
    }
    
    return self;
 }
 
+- (void)dealloc
+{
+   [_zipFile close];
+}
+
 - (void) setProgressDelegate:(id<ProgressDelegate>)delegate
 {
    _zipDelegate = delegate;
+}
+
+- (NSArray *) zipFileList
+{
+   NSMutableArray * result = nil;
+   NSArray * fileInfoList = [_zipFile listFileInZipInfos];
+   if (fileInfoList.count)
+   {
+      result = [NSMutableArray arrayWithCapacity:fileInfoList.count];
+      for (FileInZipInfo * info in fileInfoList)
+         if (info.name)
+            [result addObject:info.name];
+   }
+   
+   return result;
 }
 
 - (BOOL) canUnzipToLocation:(NSURL *)unzipToFolder;
@@ -59,31 +81,6 @@
    if (![self insureAdequateDiskSpace:unzipToFolder]) return NO;
 
    return YES;
-}
-
-- (void) unzipToLocation:(NSURL *)unzipToFolder
-{
-   _totalDestinationBytesWritten = 0;
-   
-   [_zipFile goToFirstFileInZip];
-   
-   do
-   {
-      FileInZipInfo * info = [_zipFile getCurrentFileInZipInfo];
-      
-      if ([_zipDelegate respondsToSelector:@selector(updateCurrentFile:)])
-         [_zipDelegate  updateCurrentFile:info.name];
-      
-      ZipReadStream * readStream = [_zipFile readCurrentFileInZip];
-      
-      [self extractStream:readStream
-                 toFolder:unzipToFolder
-                 withInfo:info
-           singleFileOnly:NO];
-      
-      [readStream finishedReading];
-      
-   } while ([_zipFile goToNextFileInZip]);
 }
 
 - (void) unzipOneFile:(NSString *)fileName toLocation:(NSURL *)unzipToFolder
@@ -130,6 +127,60 @@
    }
 }
 
+- (void) unzipToLocation:(NSURL *)unzipToFolder
+{
+   if ([self insureAdequateDiskSpace:unzipToFolder] == NO)  return;
+       
+   _totalDestinationBytesWritten = 0;
+   
+   [_zipFile goToFirstFileInZip];
+   
+   do
+   {
+      FileInZipInfo * info = [_zipFile getCurrentFileInZipInfo];
+      
+      if ([_zipDelegate respondsToSelector:@selector(updateCurrentFile:)])
+         [_zipDelegate  updateCurrentFile:info.name];
+      
+      ZipReadStream * readStream = [_zipFile readCurrentFileInZip];
+      
+      [self extractStream:readStream
+                 toFolder:unzipToFolder
+                 withInfo:info
+           singleFileOnly:NO];
+      
+      [readStream finishedReading];
+      
+   } while ([_zipFile goToNextFileInZip]);
+}
+
+- (void) unzipToLocation:(NSURL *)unzipToFolder
+     withCompletionBlock:(void(^)(NSError * error))completion
+{
+   if (_zipFile == nil)
+      _zipFile = [[ZipFile alloc] initWithFileName:_zipFilePath mode:ZipFileModeUnzip];
+   
+   dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+   if (queue)
+   {
+      dispatch_async(queue, ^{ [self unzipToLocation:unzipToFolder]; });
+   }
+   else
+   {
+      NSString * message = @"Failed to get a system queue to extract date from zip file";
+      _zipFileError = [NSError errorWithDomain:@"ZipException"
+                                          code:2
+                                      userInfo:[NSDictionary
+                                                dictionaryWithObject:message
+                                                forKey:NSLocalizedDescriptionKey]];
+      [_zipDelegate updateError:_zipFileError];
+   }
+   
+   [_zipFile close];
+   _zipFile = nil;
+   
+   if (completion) completion(_zipFileError);
+}
 
 #pragma mark helpers
 - (BOOL) insureRequiredFilesExist:(NSArray *)requredFiles
@@ -141,10 +192,9 @@
 
    NSArray * fileInfoList = [_zipFile listFileInZipInfos];
    for (NSString * name in requredFiles)
-      if (name)
-         for (FileInZipInfo * info in fileInfoList)
-            if ([info.name compare:name options:NSCaseInsensitiveSearch] != NSOrderedSame)
-               return NO;
+      for (FileInZipInfo * info in fileInfoList)
+         if ([name compare:info.name] != NSOrderedSame)
+            return NO;
    
    return YES;
 }
@@ -215,7 +265,8 @@
    
    if (success == NO || error != nil)
    {
-      [_zipDelegate updateEror:error];
+      _zipFileError = error;
+      [_zipDelegate updateError:_zipFileError];
       return result;
    }
    
@@ -224,7 +275,8 @@
    NSFileHandle * handle = [NSFileHandle fileHandleForWritingToURL:fullUrl  error:&error];
    if (handle == nil || error != nil)
    {
-      [_zipDelegate updateEror:error];
+      _zipFileError = error;
+      [_zipDelegate updateError:_zipFileError];
       return result;
    }
    
@@ -267,39 +319,30 @@
    }
    @catch (ZipException *ze)
    {
-      if (_zipDelegate)
-      {
-         NSString * reason = [ze reason];
-         if (reason == nil)
-            reason = @"Unknown failure";
-         
-         NSError * error =
-            [NSError errorWithDomain:@"ZipException"
-                                code:ze.error
-                            userInfo:[NSDictionary dictionaryWithObject:reason
-                                                                 forKey:NSLocalizedDescriptionKey]];
-         [_zipDelegate updateEror:error];
-      }
+      NSString * reason = [ze reason];
+      if (reason == nil)
+         reason = @"Unknown failure";
       
-      NSLog(@"ZipException caught: %ld - %@", (long)ze.error, [ze reason]);
+      _zipFileError =
+         [NSError errorWithDomain:@"ZipException"
+                             code:ze.error
+                         userInfo:[NSDictionary dictionaryWithObject:reason
+                                                              forKey:NSLocalizedDescriptionKey]];
+      [_zipDelegate updateError:_zipFileError];
    }
    @catch (id e)
    {
-      if (_zipDelegate)
-      {
-         NSString * reason = [e description];
-         if (reason == nil)
-            reason = @"Unknown failure";
-         
-         NSError * error =
-            [NSError errorWithDomain:@"ZipException"
-                                code:1
-                            userInfo:[NSDictionary dictionaryWithObject:reason
-                                                                 forKey:NSLocalizedDescriptionKey]];
-         [_zipDelegate updateEror:error];
-      }
+      NSString * reason = [e description];
+      if (reason == nil)
+         reason = @"Unknown failure";
       
-      NSLog(@"Exception caught: %@ - %@", [[e class] description], [e description]);
+      _zipFileError =
+         [NSError errorWithDomain:@"ZipException"
+                             code:1
+                         userInfo:[NSDictionary dictionaryWithObject:reason
+                                                              forKey:NSLocalizedDescriptionKey]];
+          
+      [_zipDelegate updateError:_zipFileError];
    }
    
    [handle closeFile];
