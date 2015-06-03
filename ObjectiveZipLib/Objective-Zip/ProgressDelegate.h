@@ -4,10 +4,6 @@
 
 #import <Foundation/Foundation.h>
 
-#include <map>
-#include <string>
-
-
 //
 // ProgressDelegate - called with progress of zipfile creation
 //    NOTES: progress is an estimate.  this only works well when no compression is being used
