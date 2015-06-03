@@ -22,6 +22,7 @@
    ZipFile *            _zipFile;
    
    unsigned long long   _totalSourceFileSize;
+   unsigned long long   _totalDestinationBytesWritten;
    std::map<std::string, std::string> _zipFileMapping;
 }
 
@@ -69,6 +70,8 @@
 
 - (void) createFlatZipFile
 {
+   _totalDestinationBytesWritten = 0;
+   
    if (![self canZipFlatFile]) return;
    
    std::map<std::string, std::string>::iterator it = _zipFileMapping.begin();
@@ -115,7 +118,15 @@
    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
    if (queue)
    {
-      dispatch_async(queue, ^{ [self createFlatZipFile]; });
+      dispatch_async(queue,
+                     ^{
+                        [self createFlatZipFile];
+                        [_zipFile close];
+                        _zipFile = nil;
+                        
+                        if (completion) completion(_zipFileError);
+                     });
+      
    }
    else
    {
@@ -125,13 +136,16 @@
                                       userInfo:[NSDictionary
                                                 dictionaryWithObject:message
                                                 forKey:NSLocalizedDescriptionKey]];
-      [_zipDelegate updateError:_zipFileError];
+      [_zipFile close];
+      _zipFile = nil;
+      
+      if (completion)
+         completion(_zipFileError);
+      else
+         [_zipDelegate updateError:_zipFileError];
    }
    
-   [_zipFile close];
-   _zipFile = nil;
-   
-   if (completion) completion(_zipFileError);
+
 }
 
 #pragma mark helpers
@@ -300,7 +314,8 @@
          {
             [writeStream writeData:data];
             totalBytesWritten += bytesToRead;
-
+            _totalDestinationBytesWritten += data.length;
+            
             [self updateProgress:totalBytesWritten
                          forFile:fileToZip
                           ofSize:bytesInFile
