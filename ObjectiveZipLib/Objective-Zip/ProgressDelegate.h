@@ -18,7 +18,7 @@
 @protocol ProgressDelegate <NSObject>
 @required
 
-- (void) updateEror:(NSError *) theError;
+- (void) updateError:(NSError *) theError;
 
 - (void) updateProgress:(double)percentComplete;
 
