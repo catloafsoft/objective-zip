@@ -18,15 +18,15 @@
 
 // zipFilePath - the path and file name of the zipfile
 // requiredFiles  - an array of strings of filenames required to be in the archive (can be nil)
-- (id) initWithZipFilePath:(NSString *)zipFilePath andArray:(NSArray *)requiredFiles;
+- (id) initWithZipFilePath:(NSURL *)zipFileURL andArray:(NSArray *)requiredFiles;
 - (void) setProgressDelegate:(id<ProgressDelegate>)delegate;
 - (NSArray *) zipFileList;
 - (BOOL) canUnzipToLocation:(NSURL *)unzipToFolder;
-- (void) unzipOneFile:(NSString *)fileName toLocation:(NSURL *)unzipToFolder;
+- (void) unzipOneFile:(NSString *)fileNameInArchive toLocation:(NSURL *)unzipToFolder;
 - (void) unzipToLocation:(NSURL *)unzipToFolder;
 
 - (void) unzipToLocation:(NSURL *)unzipToFolder
-     withCompletionBlock:(void(^)(NSError * error))completion;
+     withCompletionBlock:(void(^)(NSURL * extractionFolder,NSError * error))completion;
 
 @property (assign, atomic) BOOL cancelUnzip;
 

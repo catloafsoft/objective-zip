@@ -18,8 +18,8 @@
 {
    NSArray *            _zipRequiredFiles;
    NSMutableArray *     _filesUnzipped;
-   NSString *           _zipFilePath;
-   NSURL *              _unzipToFolder;
+   NSURL *              _zipFileURL;
+   NSURL *              _extractionURL;
    NSError *            _zipFileError;
    ZipFile *            _zipFile;
    id<ProgressDelegate> _zipDelegate;
@@ -42,7 +42,7 @@
    {
       @try
       {
-         _zipFile = [[ZipFile alloc] initWithFileName:_zipFilePath mode:ZipFileModeUnzip];
+         _zipFile = [[ZipFile alloc] initWithFileName:[_zipFileURL path] mode:ZipFileModeUnzip];
       }
       @catch (NSException * exception)
       {
@@ -52,11 +52,11 @@
    }
 }
 
-- (id) initWithZipFilePath:(NSString *)zipFilePath andArray:(NSArray *)requiredFiles
+- (id) initWithZipFilePath:(NSURL *)zipFileURL andArray:(NSArray *)requiredFiles
 {
    if (self = [self init])
    {
-      _zipFilePath = zipFilePath;
+      _zipFileURL = zipFileURL;
       _zipRequiredFiles = requiredFiles;
       [self createZipFileIfNeeded];
       if (_zipFile == nil) return nil;
@@ -153,6 +153,59 @@
       [_filesUnzipped addObject:url];
 }
 
+- (BOOL) createUnZipFolderAtURL:(NSURL *)unzipToFolder
+{
+   NSFileManager * manager = [NSFileManager defaultManager];
+   BOOL isFolder = NO;
+   BOOL success = [manager fileExistsAtPath:[unzipToFolder path] isDirectory:&isFolder];
+   if (success == NO || isFolder == NO)
+   {
+      // TODO:LEA: Put a valid message and code here
+      int errorCode = 3;
+      NSString * message = @"Extraction path does not exist";
+      [self setErrorCode:errorCode errorMessage:message andNotify:YES];
+      return NO;
+   }
+   
+   if (_extractionURL) _extractionURL = nil;
+   
+   NSURL * lastComponent = [NSURL URLWithString:[_zipFileURL lastPathComponent]];
+   NSString * folderPart = [[lastComponent URLByDeletingPathExtension] path];
+
+   unsigned loopCount = 1;
+   
+   do
+   {
+      NSError * error = nil;
+      NSString * folder =
+         (loopCount > 1)? [NSString stringWithFormat:@"%@ %u", folderPart, loopCount] : folderPart;
+      
+      NSURL * fullPath = [unzipToFolder URLByAppendingPathComponent:folder isDirectory:YES];
+      
+      success = [manager createDirectoryAtPath:[fullPath path]
+                   withIntermediateDirectories:NO
+                                    attributes:nil
+                                         error:&error];
+      if (success == NO || error != nil)
+         ++loopCount;
+      else
+         _extractionURL = fullPath;
+      
+   } while (_extractionURL == nil && loopCount < 1000);
+   
+   
+   if (_extractionURL == nil)
+   {
+      // TODO:LEA: Put a valid message and code here
+      int errorCode = 3;
+      NSString * message = @"Could not create folder to extract zip file into";
+      [self setErrorCode:errorCode errorMessage:message andNotify:YES];
+      return NO;
+   }
+   
+   return YES;
+}
+
 - (void) unzipToLocation:(NSURL *)unzipToFolder
 {
    _totalDestinationBytesWritten = 0;
@@ -164,6 +217,8 @@
    
    if (self.cancelUnzip) [self setCancelErrorAndCleanup];
    
+   if ([self createUnZipFolderAtURL:unzipToFolder] == NO) return;
+                           
    if ([self insureAdequateDiskSpace:unzipToFolder] == NO)  return;
    
    [_zipFile goToFirstFileInZip];
@@ -175,7 +230,7 @@
       ZipReadStream * readStream = [_zipFile readCurrentFileInZip];
       
       [self extractStream:readStream
-                 toFolder:unzipToFolder
+                 toFolder:_extractionURL
                  withInfo:info
            singleFileOnly:NO];
       
@@ -191,8 +246,17 @@
    } while ([_zipFile goToNextFileInZip]);
 }
 
+- (void) cleanUpUnarchiver
+{
+   if (_zipFile)
+   {
+      [_zipFile close];
+      _zipFile = nil;
+   }
+}
+
 - (void) unzipToLocation:(NSURL *)unzipToFolder
-     withCompletionBlock:(void(^)(NSError * error))completion
+     withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion
 {
    self.cancelUnzip = NO;
    
@@ -202,10 +266,8 @@
       dispatch_async(queue,
                      ^{
                         [self unzipToLocation:unzipToFolder];
-                        [_zipFile close];
-                        _zipFile = nil;
-                        
-                        if (completion) completion(_zipFileError);
+                        [self cleanUpUnarchiver];
+                        if (completion) completion(_extractionURL, _zipFileError);
                      });
       
    }
@@ -217,7 +279,7 @@
       NSString * message = @"Failed to get a system queue to extract date from zip file";
       [self setErrorCode:2 errorMessage:message andNotify:((completion)? NO : YES)];
       
-      if (completion) completion(_zipFileError);
+      if (completion) completion(_extractionURL, _zipFileError);
    }
 }
 
@@ -251,6 +313,14 @@
    {
       NSError * error = nil;
       BOOL result = [[NSFileManager defaultManager] removeItemAtURL:url error:&error];
+      if (result == NO || error != nil)
+         [self setError:error andNotify:YES];
+   }
+   
+   if (_extractionURL)
+   {
+      NSError * error = nil;
+      BOOL result = [[NSFileManager defaultManager] removeItemAtURL:_extractionURL error:&error];
       if (result == NO || error != nil)
          [self setError:error andNotify:YES];
    }
@@ -310,7 +380,8 @@
 }
 
 - (void) updateProgress:(unsigned long long) bytesReadFromFile
-            forFileInfo:(FileInZipInfo*) info
+             forFileURL:(NSURL *)fileUrl
+            withFileInfo:(FileInZipInfo*) info
          singleFileOnly:(BOOL) singleFileOnly
 {
    if (_zipDelegate == nil) return;
@@ -319,7 +390,7 @@
    
    // update current file progress
    if ([_zipDelegate respondsToSelector:@selector(updateProgress:forFile:)])
-      [_zipDelegate updateProgress:progress forFile:info.name];
+      [_zipDelegate updateProgress:progress forFile:fileUrl];
    
    // update overall progress
    if (singleFileOnly == NO)
@@ -341,7 +412,7 @@
    NSURL * fullUrl = [unzipToFolder URLByAppendingPathComponent:info.name];
    
    if ([_zipDelegate respondsToSelector:@selector(updateCurrentFile:)])
-      [_zipDelegate  updateCurrentFile:[fullUrl path]];
+      [_zipDelegate  updateCurrentFile:fullUrl];
    
    // create an empty file - don't overwrite an existing file
    NSError * error = nil;
@@ -381,7 +452,8 @@
    unsigned long  bytesToRead = 1024 * 64; // read/write 64k at a time
    
    [self updateProgress:totalBytesWritten
-            forFileInfo:info
+             forFileURL:fullUrl
+           withFileInfo:info
          singleFileOnly:singleFileOnly];
    
    @try
@@ -399,7 +471,8 @@
          _totalDestinationBytesWritten += data.length;
          
          [self updateProgress:totalBytesWritten
-                  forFileInfo:info
+                   forFileURL:fullUrl
+                 withFileInfo:info
                singleFileOnly:singleFileOnly];
          
       } while (totalBytesWritten < info.size);

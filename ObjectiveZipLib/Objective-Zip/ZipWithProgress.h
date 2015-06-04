@@ -19,7 +19,7 @@
 
 // zipFilePath - the path and file name of the zipfile
 // filesToZip  - map<fullPathAndFileNameToFilesToAddToArchive nameOfFileInArchive>
-- (id)   initWithZipFilePath:(NSString *)zipFilePath
+- (id)   initWithZipFilePath:(NSURL *)zipFileURL
                     andArray:(std::map<std::string, std::string>)filesToZip;
 - (void) setProgressDelegate:(id<ProgressDelegate>)delegate;
 - (BOOL) canZipFlatFile;

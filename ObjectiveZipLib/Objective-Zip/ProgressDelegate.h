@@ -15,11 +15,10 @@
 @required
 
 - (void) updateError:(NSError *) theError;
-
 - (void) updateProgress:(double)percentComplete;
 
 @optional
-- (void) updateProgress:(double)percentComplete forFile:(NSString *)fileNameInZip;
-- (void) updateCurrentFile:(NSString *)fileNameInZip;
+- (void) updateProgress:(double)percentComplete forFile:(NSURL *)fileNameInZip;
+- (void) updateCurrentFile:(NSURL *)fileNameInZip;
 
 @end
