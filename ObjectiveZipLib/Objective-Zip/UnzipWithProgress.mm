@@ -155,8 +155,6 @@
 
 - (BOOL) createUnZipFolderAtURL:(NSURL *)unzipToFolder
 {
-   BOOL result = NO;
-   
    NSFileManager * manager = [NSFileManager defaultManager];
    BOOL isFolder = NO;
    BOOL success = [manager fileExistsAtPath:[unzipToFolder path] isDirectory:&isFolder];
@@ -166,20 +164,21 @@
       int errorCode = 3;
       NSString * message = @"Extraction path does not exist";
       [self setErrorCode:errorCode errorMessage:message andNotify:YES];
-      return result;
+      return NO;
    }
    
    if (_extractionURL) _extractionURL = nil;
    
-   NSString * folderPart = [_zipFileURL lastPathComponent];
+   NSURL * lastComponent = [NSURL URLWithString:[_zipFileURL lastPathComponent]];
+   NSString * folderPart = [[lastComponent URLByDeletingPathExtension] path];
 
-   unsigned loopCount = 0;
+   unsigned loopCount = 1;
    
    do
    {
       NSError * error = nil;
       NSString * folder =
-         (loopCount)? [NSString stringWithFormat:@"%@-%u", folderPart, loopCount] : folderPart;
+         (loopCount > 1)? [NSString stringWithFormat:@"%@ %u", folderPart, loopCount] : folderPart;
       
       NSURL * fullPath = [unzipToFolder URLByAppendingPathComponent:folder isDirectory:YES];
       
@@ -195,15 +194,16 @@
    } while (_extractionURL == nil && loopCount < 1000);
    
    
-   if (result == NO)
+   if (_extractionURL == nil)
    {
       // TODO:LEA: Put a valid message and code here
       int errorCode = 3;
       NSString * message = @"Could not create folder to extract zip file into";
       [self setErrorCode:errorCode errorMessage:message andNotify:YES];
+      return NO;
    }
    
-   return result;
+   return YES;
 }
 
 - (void) unzipToLocation:(NSURL *)unzipToFolder
@@ -246,6 +246,15 @@
    } while ([_zipFile goToNextFileInZip]);
 }
 
+- (void) cleanUpUnarchiver
+{
+   if (_zipFile)
+   {
+      [_zipFile close];
+      _zipFile = nil;
+   }
+}
+
 - (void) unzipToLocation:(NSURL *)unzipToFolder
      withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion
 {
@@ -257,9 +266,7 @@
       dispatch_async(queue,
                      ^{
                         [self unzipToLocation:unzipToFolder];
-                        [_zipFile close];
-                        _zipFile = nil;
-                        
+                        [self cleanUpUnarchiver];
                         if (completion) completion(_extractionURL, _zipFileError);
                      });
       
