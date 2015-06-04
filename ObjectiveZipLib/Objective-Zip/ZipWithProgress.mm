@@ -16,12 +16,12 @@
 @interface ZipWithProgress()
 {
    
-   NSString *           _zipFilePath;
+   NSURL *              _zipFileURL;
    NSError *            _zipFileError;
    id<ProgressDelegate> _zipDelegate;
    ZipFile *            _zipFile;
    
-   NSString *           _createdZipFile;
+   NSURL *              _createdZipFile;
    unsigned long long   _totalSourceFileSize;
    unsigned long long   _totalDestinationBytesWritten;
    std::map<std::string, std::string> _zipFileMapping;
@@ -41,7 +41,7 @@
    {
       @try
       {
-         _zipFile = [[ZipFile alloc] initWithFileName:_zipFilePath mode:ZipFileModeCreate];
+         _zipFile = [[ZipFile alloc] initWithFileName:[_zipFileURL path] mode:ZipFileModeCreate];
       }
       @catch (NSException * exception)
       {
@@ -51,12 +51,12 @@
    }
 }
 
-- (id) initWithZipFilePath:(NSString *)zipFilePath
+- (id) initWithZipFilePath:(NSURL *)zipFileURL
                   andArray:(std::map<std::string, std::string>)filesToZip
 {
    if (self = [self init])
    {
-      _zipFilePath = zipFilePath;
+      _zipFileURL = zipFileURL;
       _zipFileMapping = filesToZip;
       [self createZipFileIfNeeded];
       if (_zipFile == nil) return nil;
@@ -93,7 +93,7 @@
    if (_zipFile == nil) return;
    
    // set the file so it will be cleaned up
-   _createdZipFile = _zipFilePath;
+   _createdZipFile = _zipFileURL;
    
    if (self.cancelZipping)
    {
@@ -106,7 +106,7 @@
    std::map<std::string, std::string>::iterator it = _zipFileMapping.begin();
    for (; it != _zipFileMapping.end(); ++it)
    {
-      NSString * sourceFileName = [NSString stringWithUTF8String:it->first.c_str()];
+      NSURL * sourceFileName = [NSURL fileURLWithPath:[NSString stringWithUTF8String:it->first.c_str()]];
       NSString * fileinArchiveName = [NSString stringWithUTF8String:it->second.c_str()];
       
       if ([_zipDelegate respondsToSelector:@selector(updateCurrentFile:)])
@@ -117,7 +117,7 @@
       if (writeStream)
       {
          [self writeStream:writeStream
-                  fromFile:[NSURL fileURLWithPath:sourceFileName]
+                   fromURL:sourceFileName
             singleFileOnly:NO];
          
          [writeStream finishedWriting];
@@ -196,7 +196,7 @@
    if (_createdZipFile)
    {
       NSError * error = nil;
-      BOOL result = [[NSFileManager defaultManager] removeItemAtPath:_createdZipFile error:&error];
+      BOOL result = [[NSFileManager defaultManager] removeItemAtURL:_createdZipFile error:&error];
       if (result == NO || error != nil)
          [self setError:error andNotify:YES];
    }
@@ -285,7 +285,7 @@
 
 - (BOOL) insureAdequateDiskSpace
 {
-   if (_zipFilePath == nil) return NO;
+   if (_zipFileURL == nil) return NO;
    
    unsigned long long totalSize = [self totalSourceFileSize];
    if (totalSize)
@@ -298,7 +298,7 @@
 
 - (BOOL) insureCanCreateZipFileAtLocation
 {
-   if (_zipFilePath == nil) return NO;
+   if (_zipFileURL == nil) return NO;
    
    return YES;
 }
@@ -314,7 +314,7 @@
    
    // update current file progress
    if ([_zipDelegate respondsToSelector:@selector(updateProgress:forFile:)])
-      [_zipDelegate updateProgress:progress forFile:[fileToZip path]];
+      [_zipDelegate updateProgress:progress forFile:fileToZip];
    
    // update overall progress
    if (singleFileOnly == NO)
@@ -328,7 +328,7 @@
 
 
 - (BOOL) writeStream:(ZipWriteStream *) writeStream
-            fromFile:(NSURL *) fileToZip
+             fromURL:(NSURL *) fileToZip
       singleFileOnly:(BOOL) singleFileOnly
 {
    BOOL result = NO;
