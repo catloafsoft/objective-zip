@@ -79,9 +79,9 @@
 {
    if (![self insureNoDuplicates]) return NO;
    if (![self insureSourceFilesExist]) return NO;
-   if ([self totalSourceFileSize] == 0) return NO;
-   if (![self insureAdequateDiskSpace]) return NO;
    if (![self insureCanCreateZipFileAtLocation]) return NO;
+   if ( [self totalSourceFileSize] == 0) return NO;
+   if (![self insureAdequateDiskSpace]) return NO;
    return YES;
 }
 
@@ -283,22 +283,45 @@
    return YES;
 }
 
-- (BOOL) insureAdequateDiskSpace
+- (BOOL) insureCanCreateZipFileAtLocation
 {
    if (_zipFileURL == nil) return NO;
    
-   unsigned long long totalSize = [self totalSourceFileSize];
-   if (totalSize)
-   {
-      
-   }
+   NSURL * folder = [_zipFileURL URLByDeletingLastPathComponent];
+   
+   NSFileManager * manager = [NSFileManager defaultManager];
+   BOOL isFolder = NO;
+   BOOL success = [manager fileExistsAtPath:[folder path] isDirectory:&isFolder];
+   if (success == NO || isFolder == NO)
+      return NO;
+   
+   NSString * tmpString = [folder path];
+   if (![tmpString hasSuffix:@"/"])
+      tmpString = [tmpString stringByAppendingString:@"/"];
+   
+   return [manager isWritableFileAtPath:tmpString];
    
    return YES;
 }
 
-- (BOOL) insureCanCreateZipFileAtLocation
+- (BOOL) insureAdequateDiskSpace
 {
    if (_zipFileURL == nil) return NO;
+   
+   unsigned long long spaceNeeded = [self totalSourceFileSize];
+   if (spaceNeeded)
+   {
+      NSError * error = nil;
+      NSDictionary * dict = [[NSFileManager defaultManager]
+                             attributesOfFileSystemForPath:[_zipFileURL path] error:&error];
+      
+      if (dict == nil || error != nil)
+         return NO;
+      
+      unsigned long long freeSpace = [[dict objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
+      if (spaceNeeded >= freeSpace) // TODO:LEA: add a buffer of 10MB or so at least
+         return NO;
+   }
    
    return YES;
 }

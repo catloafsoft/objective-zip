@@ -67,7 +67,7 @@
 
 - (void)dealloc
 {
-   [_zipFile close];
+   [self cleanUpUnarchiver];
 }
 
 - (void) setProgressDelegate:(id<ProgressDelegate>)delegate
@@ -105,32 +105,18 @@
    FileInZipInfo * fileInfo = nil;
    ZipReadStream * readStream = nil;
    
-   if ([_zipFile locateFileInZip:fileName])
+   [_zipFile goToFirstFileInZip];
+   
+   do
    {
-      FileInZipInfo * info = [ _zipFile getCurrentFileInZipInfo];
+      FileInZipInfo * info = [_zipFile getCurrentFileInZipInfo];
       if ([info.name compare:fileName] == NSOrderedSame)
       {
          readStream = [_zipFile readCurrentFileInZip];
          fileInfo = info;
+         break;
       }
-   }
-   
-   if (readStream == nil)
-   {
-      // do a case insensitive search for the file
-      [_zipFile goToFirstFileInZip];
-      
-      do
-      {
-         FileInZipInfo * info = [_zipFile getCurrentFileInZipInfo];
-         if ([info.name compare:fileName options:NSCaseInsensitiveSearch] == NSOrderedSame)
-         {
-            readStream = [_zipFile readCurrentFileInZip];
-            fileInfo = info;
-            break;
-         }
-      } while ([_zipFile goToNextFileInZip]);
-   }
+   } while ([_zipFile goToNextFileInZip]);
    
    if (readStream != nil)
    {
@@ -273,8 +259,7 @@
    }
    else
    {
-      [_zipFile close];
-      _zipFile = nil;
+      [self cleanUpUnarchiver];
       
       NSString * message = @"Failed to get a system queue to extract date from zip file";
       [self setErrorCode:2 errorMessage:message andNotify:((completion)? NO : YES)];
@@ -367,15 +352,36 @@
 
 - (BOOL) insureCanUnzipToLocation:(NSURL *)folderToUnzipTo
 {
-   // TODO:LEA: test for write access to folder
-   return YES;
+   NSFileManager * manager = [NSFileManager defaultManager];
+   BOOL isFolder = NO;
+   BOOL success = [manager fileExistsAtPath:[folderToUnzipTo path] isDirectory:&isFolder];
+   if (success == NO || isFolder == NO)
+      return NO;
+   
+   NSString * tmpString = [folderToUnzipTo path];
+   if (![tmpString hasSuffix:@"/"])
+      tmpString = [tmpString stringByAppendingString:@"/"];
+   
+   return [manager isWritableFileAtPath:tmpString];
 }
 
 - (BOOL) insureAdequateDiskSpace:(NSURL *)folderToUnzipTo
 {
-   NSUInteger spaceNeeded = [self totalDstinationFileSize];
-   if (spaceNeeded) return YES;
-   // TODO:LEA: need to check for enough space in the destination location
+   unsigned long long spaceNeeded = [self totalDstinationFileSize];
+   if (spaceNeeded)
+   {
+      NSError * error = nil;
+      NSDictionary * dict = [[NSFileManager defaultManager]
+                             attributesOfFileSystemForPath:[folderToUnzipTo path] error:&error];
+      
+      if (dict == nil || error != nil)
+         return NO;
+      
+      unsigned long long freeSpace = [[dict objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
+      if (spaceNeeded >= freeSpace) // TODO:LEA: add a buffer of 10MB or so at least
+         return NO;
+   }
+   
    return YES;
 }
 
@@ -494,6 +500,5 @@
    
    return result;
 }
-
 
 @end
