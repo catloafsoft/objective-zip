@@ -15,15 +15,6 @@
 //
 @interface ZipWithProgress()
 {
-   
-   NSURL *              _zipFileURL;
-   NSError *            _zipFileError;
-   id<ProgressDelegate> _zipDelegate;
-   ZipFile *            _zipFile;
-   
-   NSURL *              _createdZipFile;
-   unsigned long long   _totalSourceFileSize;
-   unsigned long long   _totalDestinationBytesWritten;
    std::map<std::string, std::string> _zipFileMapping;
 }
 
@@ -35,47 +26,20 @@
 //
 @implementation ZipWithProgress
 
-- (void) createZipFileIfNeeded
-{
-   if (_zipFile == nil)
-   {
-      @try
-      {
-         _zipFile = [[ZipFile alloc] initWithFileName:[_zipFileURL path] mode:ZipFileModeCreate];
-      }
-      @catch (NSException * exception)
-      {
-         [self setErrorCode:10 errorMessage:exception.reason andNotify:YES];
-         _zipFile = nil;   // something failed during initialization
-      }
-   }
-}
 
 - (id) initWithZipFilePath:(NSURL *)zipFileURL
-                  andArray:(std::map<std::string, std::string>)filesToZip
+                   fileMap:(std::map<std::string, std::string>)filesToZip
+               andDelegate:(id<ProgressDelegate>)delegate
 {
-   if (self = [self init])
+   if (self = [super initWithZipFile:zipFileURL forMode:ZipFileModeCreate withDelegate:delegate])
    {
-      _zipFileURL = zipFileURL;
       _zipFileMapping = filesToZip;
-      [self createZipFileIfNeeded];
-      if (_zipFile == nil) return nil;
    }
    
    return self;
 }
 
-- (void) dealloc
-{
-   if (_zipFile) [_zipFile close];
-}
-
-- (void) setProgressDelegate:(id<ProgressDelegate>)delegate
-{
-   _zipDelegate = delegate;
-}
-
-- (BOOL) canZipFlatFile
+- (BOOL) canZipFiles
 {
    if (![self insureNoDuplicates]) return NO;
    if (![self insureSourceFilesExist]) return NO;
@@ -85,23 +49,15 @@
    return YES;
 }
 
-- (void) createFlatZipFile
+- (void) createZipFile
 {
-   _totalDestinationBytesWritten = 0;
+   if (![self prepareForOperation]) return;
    
-   [self createZipFileIfNeeded];
-   if (_zipFile == nil) return;
+   [self addToFilesCreated:_zipFileURL];
    
-   // set the file so it will be cleaned up
-   _createdZipFile = _zipFileURL;
+   if (self.cancelOperation) return [self setCancelErrorAndCleanup];
    
-   if (self.cancelZipping)
-   {
-      [self setCancelErrorAndCleanup];
-      return;
-   }
-   
-   if (![self canZipFlatFile]) return;
+   if (![self canZipFiles]) return;
    
    std::map<std::string, std::string>::iterator it = _zipFileMapping.begin();
    for (; it != _zipFileMapping.end(); ++it)
@@ -112,7 +68,7 @@
       if ([_zipDelegate respondsToSelector:@selector(updateCurrentFile:)])
          [_zipDelegate  updateCurrentFile:sourceFileName];
          
-      ZipWriteStream * writeStream = [_zipFile writeFileInZipWithName:fileinArchiveName
+      ZipWriteStream * writeStream = [_zipTool writeFileInZipWithName:fileinArchiveName
                                                      compressionLevel:ZipCompressionLevelNone];
       if (writeStream)
       {
@@ -124,7 +80,7 @@
          
          if (_zipFileError != nil) break;
          
-         if (self.cancelZipping)
+         if (self.cancelOperation)
          {
             [self setCancelErrorAndCleanup];
             break;
@@ -139,28 +95,24 @@
    }
 }
 
-- (void) createFlatZipFileWithCompletionBlock:(void(^)(NSError * error))completion
+- (void) createZipFileWithCompletionBlock:(void(^)(NSError * error))completion
 {
-   self.cancelZipping = NO;
+   self.cancelOperation = NO;
    
    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
    if (queue)
    {
       dispatch_async(queue,
                      ^{
-                        [self createFlatZipFile];
-                        [_zipFile close];
-                        _zipFile = nil;
-                        
+                        [self createZipFile];
+                        [self performZipToolCleanup];
                         if (completion) completion(_zipFileError);
                      });
       
    }
    else
    {
-      [_zipFile close];
-      _zipFile = nil;
-      
+      [self performZipToolCleanup];
       NSString * message = @"Failed to get a system queue to execute zip file creation";
       [self setErrorCode:2 errorMessage:message andNotify:((completion)? NO : YES)];
       
@@ -170,53 +122,9 @@
 
 #pragma mark helpers
 
-- (void) setError:(NSError *)error andNotify:(BOOL)notify
-{
-   if (error)
-   {
-      _zipFileError = error;
-      if (notify) [_zipDelegate updateError:_zipFileError];
-   }
-}
-
-- (void) setErrorCode:(NSInteger)code errorMessage:(NSString *)message andNotify:(BOOL)notify
-{
-   if (message == nil) message = @"Unknown failure";
-   
-   [self setError:[NSError errorWithDomain:@"ZipException"
-                                       code:code
-                                   userInfo:[NSDictionary
-                                                dictionaryWithObject:message
-                                                              forKey:NSLocalizedDescriptionKey]]
-        andNotify:notify];
-}
-
-- (void) performFileCleanup
-{
-   if (_createdZipFile)
-   {
-      NSError * error = nil;
-      BOOL result = [[NSFileManager defaultManager] removeItemAtURL:_createdZipFile error:&error];
-      if (result == NO || error != nil)
-         [self setError:error andNotify:YES];
-   }
-}
-
-- (void) setCancelError
-{
-   NSString * message = @"User cancelled error";
-   [self setErrorCode:-128 errorMessage:message andNotify:YES];
-}
-
-- (void) setCancelErrorAndCleanup
-{
-   [self setCancelError];
-   [self performFileCleanup];
-}
-
 - (NSUInteger) totalSourceFileSize
 {
-   if (_totalSourceFileSize) return _totalSourceFileSize;
+   if (_totalFileSize) return _totalFileSize;
    
    std::map<std::string, std::string>::iterator it = _zipFileMapping.begin();
    for ( ; it != _zipFileMapping.end(); ++it)
@@ -231,17 +139,17 @@
                                                 error:&error];
          if (handle == nil || error != nil)
          {
-            _totalSourceFileSize = 0;
+            _totalFileSize = 0;
             [self setError:error andNotify:YES];
-            return _totalSourceFileSize;
+            return _totalFileSize;
          }
          
          unsigned long long bytesInFile = [handle seekToEndOfFile];
-         _totalSourceFileSize += bytesInFile;
+         _totalFileSize += bytesInFile;
       }
    }
    
-   return _totalSourceFileSize;
+   return _totalFileSize;
 }
 
 - (BOOL) insureNoDuplicates
@@ -391,7 +299,7 @@
    {
       do
       {
-         if (self.cancelZipping) break;
+         if (self.cancelOperation) break;
          
          if (bytesToRead > (bytesInFile - totalBytesWritten))
             bytesToRead = bytesInFile - totalBytesWritten;

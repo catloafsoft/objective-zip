@@ -16,16 +16,8 @@
 //
 @interface UnzipWithProgress()
 {
-   NSArray *            _zipRequiredFiles;
-   NSMutableArray *     _filesUnzipped;
-   NSURL *              _zipFileURL;
-   NSURL *              _extractionURL;
-   NSError *            _zipFileError;
-   ZipFile *            _zipFile;
-   id<ProgressDelegate> _zipDelegate;
-   
-   unsigned long long   _totalDestinationFileSize;
-   unsigned long long   _totalDestinationBytesWritten;
+   NSArray * _zipRequiredFiles;
+   NSURL *   _extractionURL;
 }
 
 @end
@@ -36,49 +28,22 @@
 //
 @implementation UnzipWithProgress
 
-- (void) createZipFileIfNeeded
+- (id) initWithZipFilePath:(NSURL *)zipFileURL
+             requiredFiles:(NSArray *)requiredFiles
+               andDelegate:(id<ProgressDelegate>)delegate
 {
-   if (_zipFile == nil)
+   if (self = [super initWithZipFile:zipFileURL forMode:ZipFileModeUnzip withDelegate:delegate])
    {
-      @try
-      {
-         _zipFile = [[ZipFile alloc] initWithFileName:[_zipFileURL path] mode:ZipFileModeUnzip];
-      }
-      @catch (NSException * exception)
-      {
-         [self setErrorCode:10 errorMessage:exception.reason andNotify:YES];
-         _zipFile = nil;   // something failed during initialization
-      }
-   }
-}
-
-- (id) initWithZipFilePath:(NSURL *)zipFileURL andArray:(NSArray *)requiredFiles
-{
-   if (self = [self init])
-   {
-      _zipFileURL = zipFileURL;
       _zipRequiredFiles = requiredFiles;
-      [self createZipFileIfNeeded];
-      if (_zipFile == nil) return nil;
    }
    
    return self;
 }
 
-- (void)dealloc
-{
-   [self cleanUpUnarchiver];
-}
-
-- (void) setProgressDelegate:(id<ProgressDelegate>)delegate
-{
-   _zipDelegate = delegate;
-}
-
 - (NSArray *) zipFileList
 {
    NSMutableArray * result = nil;
-   NSArray * fileInfoList = [_zipFile listFileInZipInfos];
+   NSArray * fileInfoList = [_zipTool listFileInZipInfos];
    if (fileInfoList.count)
    {
       result = [NSMutableArray arrayWithCapacity:fileInfoList.count];
@@ -93,50 +58,50 @@
 - (BOOL) canUnzipToLocation:(NSURL *)unzipToFolder;
 {
    if (![self insureRequiredFilesExist:_zipRequiredFiles]) return NO;
-   if ([self totalDstinationFileSize] == 0) return NO;
+   if ( [self totalDstinationFileSize] == 0) return NO;
    if (![self insureCanUnzipToLocation:unzipToFolder]) return NO;
    if (![self insureAdequateDiskSpace:unzipToFolder]) return NO;
 
    return YES;
 }
 
-- (void) unzipOneFile:(NSString *)fileName toLocation:(NSURL *)unzipToFolder
+- (BOOL) unzipOneFile:(NSString *)fileName toLocation:(NSURL *)unzipToFolder
 {
+   BOOL result = NO;
+   
+   if (![self insureCanUnzipToLocation:unzipToFolder]) return result;
+   
+   // find the stream and info for the file in the archive
    FileInZipInfo * fileInfo = nil;
    ZipReadStream * readStream = nil;
    
-   [_zipFile goToFirstFileInZip];
+   [_zipTool goToFirstFileInZip];
    
    do
    {
-      FileInZipInfo * info = [_zipFile getCurrentFileInZipInfo];
+      FileInZipInfo * info = [_zipTool getCurrentFileInZipInfo];
       if ([info.name compare:fileName] == NSOrderedSame)
       {
-         readStream = [_zipFile readCurrentFileInZip];
+         readStream = [_zipTool readCurrentFileInZip];
          fileInfo = info;
          break;
       }
-   } while ([_zipFile goToNextFileInZip]);
+   } while ([_zipTool goToNextFileInZip]);
    
-   if (readStream != nil)
-   {
-      _totalDestinationBytesWritten = 0;
-      [self extractStream:readStream
-                 toFolder:unzipToFolder
-                 withInfo:fileInfo
-           singleFileOnly:YES];
-      
-      [readStream finishedReading];
-   }
-}
-
-- (void) addToFilesUnzipped:(NSURL *) url
-{
-   if (_filesUnzipped == nil)
-      _filesUnzipped = [NSMutableArray new];
    
-   if (url)
-      [_filesUnzipped addObject:url];
+   if (readStream == nil || fileInfo == nil) return result;
+   if (![self insureAdequateDiskSpaceInFolder:unzipToFolder forSize:fileInfo.size]) return NO;
+   
+   // extract the file
+   _totalDestinationBytesWritten = 0;
+   result = [self extractStream:readStream
+                       toFolder:unzipToFolder
+                       withInfo:fileInfo
+                 singleFileOnly:YES];
+   
+   [readStream finishedReading];
+   
+   return result;
 }
 
 - (BOOL) createUnZipFolderAtURL:(NSURL *)unzipToFolder
@@ -194,26 +159,21 @@
 
 - (void) unzipToLocation:(NSURL *)unzipToFolder
 {
-   _totalDestinationBytesWritten = 0;
-   [_filesUnzipped removeAllObjects];
+   if (![self prepareForOperation]) return;
    
-   [self createZipFileIfNeeded];
-   
-   if (_zipFile == nil) return;
-   
-   if (self.cancelUnzip) [self setCancelErrorAndCleanup];
+   if (self.cancelOperation) return [self setCancelErrorAndCleanup];
    
    if ([self createUnZipFolderAtURL:unzipToFolder] == NO) return;
                            
    if ([self insureAdequateDiskSpace:unzipToFolder] == NO)  return;
    
-   [_zipFile goToFirstFileInZip];
+   [_zipTool goToFirstFileInZip];
    
    do
    {
-      FileInZipInfo * info = [_zipFile getCurrentFileInZipInfo];
+      FileInZipInfo * info = [_zipTool getCurrentFileInZipInfo];
       
-      ZipReadStream * readStream = [_zipFile readCurrentFileInZip];
+      ZipReadStream * readStream = [_zipTool readCurrentFileInZip];
       
       [self extractStream:readStream
                  toFolder:_extractionURL
@@ -223,28 +183,19 @@
       [readStream finishedReading];
       
       if (_zipFileError != nil) break;
-      if (self.cancelUnzip)
+      if (self.cancelOperation)
       {
          [self setCancelErrorAndCleanup];
          break;
       }
       
-   } while ([_zipFile goToNextFileInZip]);
-}
-
-- (void) cleanUpUnarchiver
-{
-   if (_zipFile)
-   {
-      [_zipFile close];
-      _zipFile = nil;
-   }
+   } while ([_zipTool goToNextFileInZip]);
 }
 
 - (void) unzipToLocation:(NSURL *)unzipToFolder
      withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion
 {
-   self.cancelUnzip = NO;
+   self.cancelOperation = NO;
    
    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
    if (queue)
@@ -252,14 +203,14 @@
       dispatch_async(queue,
                      ^{
                         [self unzipToLocation:unzipToFolder];
-                        [self cleanUpUnarchiver];
+                        [self performZipToolCleanup];
                         if (completion) completion(_extractionURL, _zipFileError);
                      });
       
    }
    else
    {
-      [self cleanUpUnarchiver];
+      [self performZipToolCleanup];
       
       NSString * message = @"Failed to get a system queue to extract date from zip file";
       [self setErrorCode:2 errorMessage:message andNotify:((completion)? NO : YES)];
@@ -270,37 +221,11 @@
 
 
 #pragma mark helpers
-- (void) setError:(NSError *)error andNotify:(BOOL)notify
-{
-   if (error)
-   {
-      _zipFileError = error;
-      if (notify) [_zipDelegate updateError:_zipFileError];
-   }
-}
-
-- (void) setErrorCode:(NSInteger)code errorMessage:(NSString *)message andNotify:(BOOL)notify
-{
-   if (message == nil) message = @"Unknown failure";
-   
-   [self setError:[NSError errorWithDomain:@"ZipException"
-                                      code:code
-                                  userInfo:[NSDictionary
-                                            dictionaryWithObject:message
-                                            forKey:NSLocalizedDescriptionKey]]
-        andNotify:notify];
-}
 
 - (void) performFileCleanup
 {
    // clean up all of the files we have created
-   for (NSURL * url in _filesUnzipped)
-   {
-      NSError * error = nil;
-      BOOL result = [[NSFileManager defaultManager] removeItemAtURL:url error:&error];
-      if (result == NO || error != nil)
-         [self setError:error andNotify:YES];
-   }
+   [super performFileCleanup];
    
    if (_extractionURL)
    {
@@ -311,26 +236,14 @@
    }
 }
 
-- (void) setCancelError
-{
-   NSString * message = @"User cancelled error";
-   [self setErrorCode:-128 errorMessage:message andNotify:YES];
-}
-
-- (void) setCancelErrorAndCleanup
-{
-   [self setCancelError];
-   [self performFileCleanup];
-}
-
 - (BOOL) insureRequiredFilesExist:(NSArray *)requredFiles
 {
    if (requredFiles == nil) return YES;
    
-   NSUInteger numFilesInZip = [_zipFile numFilesInZip];
+   NSUInteger numFilesInZip = [_zipTool numFilesInZip];
    if (numFilesInZip == 0) return NO;
 
-   NSArray * fileInfoList = [_zipFile listFileInZipInfos];
+   NSArray * fileInfoList = [_zipTool listFileInZipInfos];
    for (NSString * name in requredFiles)
       for (FileInZipInfo * info in fileInfoList)
          if ([name compare:info.name] != NSOrderedSame)
@@ -341,13 +254,13 @@
 
 - (NSUInteger) totalDstinationFileSize
 {
-   if (_totalDestinationFileSize) return _totalDestinationFileSize;
+   if (_totalFileSize) return _totalFileSize;
    
-   NSArray * fileInfoList = [_zipFile listFileInZipInfos];
+   NSArray * fileInfoList = [_zipTool listFileInZipInfos];
    for (FileInZipInfo * info in fileInfoList)
-      _totalDestinationFileSize += info.size;
+      _totalFileSize += info.size;
    
-   return _totalDestinationFileSize;
+   return _totalFileSize;
 }
 
 - (BOOL) insureCanUnzipToLocation:(NSURL *)folderToUnzipTo
@@ -365,24 +278,32 @@
    return [manager isWritableFileAtPath:tmpString];
 }
 
-- (BOOL) insureAdequateDiskSpace:(NSURL *)folderToUnzipTo
+- (BOOL) insureAdequateDiskSpaceInFolder:(NSURL *)folderToUnzipTo
+                                 forSize:(unsigned long long) spaceNeeded
 {
-   unsigned long long spaceNeeded = [self totalDstinationFileSize];
+   static const unsigned long long s_freeSpaceBuffer = 1024 * 10000; // 10 MB buffer min disk space
    if (spaceNeeded)
    {
       NSError * error = nil;
       NSDictionary * dict = [[NSFileManager defaultManager]
                              attributesOfFileSystemForPath:[folderToUnzipTo path] error:&error];
       
-      if (dict == nil || error != nil)
-         return NO;
+      if (dict == nil || error != nil) return NO;
       
-      unsigned long long freeSpace = [[dict objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
-      if (spaceNeeded >= freeSpace) // TODO:LEA: add a buffer of 10MB or so at least
-         return NO;
+      unsigned long long freeSpace =
+      [[dict objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
+      
+      if (freeSpace < s_freeSpaceBuffer) return NO;
+      if (spaceNeeded >= (freeSpace - s_freeSpaceBuffer)) return NO;
    }
    
    return YES;
+}
+
+- (BOOL) insureAdequateDiskSpace:(NSURL *)folderToUnzipTo
+{
+   unsigned long long spaceNeeded = [self totalDstinationFileSize];
+   return [self insureAdequateDiskSpaceInFolder:folderToUnzipTo forSize:spaceNeeded];
 }
 
 - (void) updateProgress:(unsigned long long) bytesReadFromFile
@@ -433,7 +354,7 @@
       return result;
    }
    
-   [self addToFilesUnzipped:fullUrl];
+   [self addToFilesCreated:fullUrl];
    
    // open a file handle for writing to the file
    error = nil;
@@ -466,7 +387,7 @@
    {
       do
       {
-         if (self.cancelUnzip) break;
+         if (self.cancelOperation) break;
          
          if (bytesToRead > (info.size - totalBytesWritten))
             bytesToRead = info.size - totalBytesWritten;
