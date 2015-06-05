@@ -4,10 +4,13 @@
 
 #import <Foundation/Foundation.h>
 #import "ProgressDelegate.h"
-#import "ZipFile.h"
 
 #include <map>
 #include <string>
+
+
+// forward declarations
+@class ZipFile;
 
 
 //
@@ -19,15 +22,16 @@
    NSURL *              _zipFileURL;
    NSError *            _zipFileError;
    ZipFile *            _zipTool;
+   
    id<ProgressDelegate> _zipDelegate;
    
    unsigned long long   _totalFileSize;
    unsigned long long   _totalDestinationBytesWritten;
 }
 
-// protected methods
+// ideally, protected methods
 - (id) initWithZipFile:(NSURL *)zipFileURL
-               forMode:(ZipFileMode) mode
+               forMode:(unsigned) mode
           withDelegate:(id<ProgressDelegate>)delegate;
 
 - (BOOL) createZipToolIfNeeded;
@@ -43,7 +47,6 @@
 
 - (void) setCancelError;
 - (void) setCancelErrorAndCleanup;
-
 
 // public methods
 @property (assign, atomic) BOOL cancelOperation;

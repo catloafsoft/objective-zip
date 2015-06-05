@@ -28,13 +28,13 @@
 @implementation ZipProgressBase
 
 - (id) initWithZipFile:(NSURL *)zipFileURL
-               forMode:(ZipFileMode) mode
+               forMode:(unsigned) mode
           withDelegate:(id<ProgressDelegate>)delegate;
 {
    if (self = [self init])
    {
       _zipFileURL = zipFileURL;
-      _zipFileMode = mode;
+      _zipFileMode = (ZipFileMode)mode;
       
       if (![self createZipToolIfNeeded]) return nil;
       
