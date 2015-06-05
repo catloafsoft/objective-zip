@@ -38,7 +38,7 @@
       
       if (![self createZipToolIfNeeded]) return nil;
       
-      _zipDelegate = delegate;
+      [self setProgressDelegate:delegate];
    }
    
    return self;
@@ -49,6 +49,10 @@
    [self performZipToolCleanup];
 }
 
+- (void) setProgressDelegate:(id<ProgressDelegate>)delegate
+{
+   _zipDelegate = delegate;
+}
 
 #pragma mark helpers
 // protected methods

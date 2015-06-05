@@ -49,6 +49,8 @@
 - (void) setCancelErrorAndCleanup;
 
 // public methods
+- (void) setProgressDelegate:(id<ProgressDelegate>)delegate;
+
 @property (assign, atomic) BOOL cancelOperation;
 
 @end

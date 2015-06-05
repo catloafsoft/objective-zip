@@ -108,7 +108,6 @@
                         [self performZipToolCleanup];
                         if (completion) completion(_zipFileError);
                      });
-      
    }
    else
    {
