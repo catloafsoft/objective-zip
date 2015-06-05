@@ -22,7 +22,7 @@
 // filesToZip  - map<fullPathAndFileNameToFilesToAddToArchive nameOfFileInArchive>
 // delegate - ProgressDelegate protocol object to call with progress and errors
 - (id)   initWithZipFilePath:(NSURL *)zipFileURL
-                     fileMap:(std::map<std::string, std::string>)filesToZip
+                     fileMap:(const std::map<std::string, std::string> &)filesToZip
                  andDelegate:(id<ProgressDelegate>)delegate;
 
 - (BOOL) canZipFiles;

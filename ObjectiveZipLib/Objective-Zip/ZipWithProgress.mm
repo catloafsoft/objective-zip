@@ -28,7 +28,7 @@
 
 
 - (id) initWithZipFilePath:(NSURL *)zipFileURL
-                   fileMap:(std::map<std::string, std::string>)filesToZip
+                   fileMap:(const std::map<std::string, std::string> &)filesToZip
                andDelegate:(id<ProgressDelegate>)delegate
 {
    if (self = [super initWithZipFile:zipFileURL forMode:ZipFileModeCreate withDelegate:delegate])

@@ -33,7 +33,7 @@
 {
    if (self = [self init])
    {
-      _zipFileURL = zipFileURL;
+      _zipFileURL = [zipFileURL copy];
       _zipFileMode = (ZipFileMode)mode;
       
       if (![self createZipToolIfNeeded]) return nil;
