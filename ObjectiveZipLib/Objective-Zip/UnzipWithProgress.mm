@@ -120,8 +120,8 @@
    
    if (_extractionURL) _extractionURL = nil;
    
-   NSURL * lastComponent = [NSURL URLWithString:[_zipFileURL lastPathComponent]];
-   NSString * folderPart = [[lastComponent URLByDeletingPathExtension] path];
+   NSString *pathOfNewFolder = [[_zipFileURL URLByDeletingPathExtension] path];
+   NSString *folderPart = [pathOfNewFolder lastPathComponent];
 
    unsigned loopCount = 1;
    

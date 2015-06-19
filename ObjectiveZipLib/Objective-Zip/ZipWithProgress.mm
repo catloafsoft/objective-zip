@@ -41,9 +41,10 @@
 
 - (BOOL) canZipFiles
 {
-   if (![self insureNoDuplicates]) return NO;
+   // TODO:JUSTIN - some of these functions don't notify the delegate of an error
+   if (![self insureNoDuplicates]) return NO; // <-- delegate not notified of error
    if (![self insureSourceFilesExist]) return NO;
-   if (![self insureCanCreateZipFileAtLocation]) return NO;
+   if (![self insureCanCreateZipFileAtLocation]) return NO;  // <-- delegate not notified of error
    if ( [self totalSourceFileSize] == 0) return NO;
    if (![self insureAdequateDiskSpace]) return NO;
    return YES;
@@ -57,7 +58,7 @@
    
    if (self.cancelOperation) return [self setCancelErrorAndCleanup];
    
-   if (![self canZipFiles]) return;
+   if (![self canZipFiles]) return [self performFileCleanup];;
    
    std::map<std::string, std::string>::iterator it = _zipFileMapping.begin();
    for (; it != _zipFileMapping.end(); ++it)
@@ -223,7 +224,10 @@
                              attributesOfFileSystemForPath:[_zipFileURL path] error:&error];
       
       if (dict == nil || error != nil)
+      {
+         [self setError:error andNotify:YES];
          return NO;
+      }
       
       unsigned long long freeSpace = [[dict objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
       if (spaceNeeded >= freeSpace) // TODO:LEA: add a buffer of 10MB or so at least
