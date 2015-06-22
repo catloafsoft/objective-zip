@@ -5,6 +5,7 @@
 #import "ZipProgressBase.h"
 
 #import "FileInZipInfo.h"
+#import "ZipErrorCodes.h"
 #import "ZipException.h"
 #import "ZipFile.h"
 #import "ZipReadStream.h"
@@ -128,9 +129,9 @@
 
 - (void) setErrorCode:(NSInteger)code errorMessage:(NSString *)message andNotify:(BOOL)notify
 {
-   if (message == nil) message = @"Unknown failure";
+   if (message == nil) message = kOZCEM_IndeterminateError;
    
-   [self setError:[NSError errorWithDomain:@"ZipException"
+   [self setError:[NSError errorWithDomain:kOZCEM_ZipErrorDomain
                                       code:code
                                   userInfo:[NSDictionary
                                             dictionaryWithObject:message
@@ -140,8 +141,9 @@
 
 - (void) setCancelError
 {
-   NSString * message = @"User cancelled error";
-   [self setErrorCode:-128 errorMessage:message andNotify:YES];
+   [self setErrorCode:kOZCEC_UserCancelledError
+         errorMessage:kOZCEM_UserCancelledError
+            andNotify:YES];
 }
 
 - (void) setCancelErrorAndCleanup
@@ -150,6 +152,45 @@
    [self performFileCleanup];
 }
 
-
+- (BOOL) insureAdequateDiskSpaceInFolder:(NSURL *)location
+                                 forSize:(unsigned long long) spaceNeeded
+                      andFreeSpaceBuffer:(unsigned long long) bufferSpaceRemaining
+{
+   if (spaceNeeded)
+   {
+      NSError * error = nil;
+      NSDictionary * dict = [[NSFileManager defaultManager]
+                             attributesOfFileSystemForPath:[location path] error:&error];
+      
+      if (dict == nil || error != nil)
+      {
+         [self setErrorCode:kOZCEC_CannotReadSystemFolderAttributes
+               errorMessage:kOZCEM_CannotReadSystemFolderAttributes
+                  andNotify:YES];
+         return NO;
+      }
+      
+      unsigned long long freeSpace =
+         [[dict objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
+      
+      if (freeSpace < bufferSpaceRemaining)
+      {
+         [self setErrorCode:kOZCEC_NotEnoughDiskSpace
+               errorMessage:kOZCEM_NotEnoughDiskSpace
+                  andNotify:YES];
+         return NO;
+      }
+      
+      if (spaceNeeded >= (freeSpace - bufferSpaceRemaining))
+      {
+         [self setErrorCode:kOZCEC_NotEnoughDiskSpace
+               errorMessage:kOZCEM_NotEnoughDiskSpace
+                  andNotify:YES];
+         return NO;
+      }
+   }
+   
+   return YES;
+}
 
 @end

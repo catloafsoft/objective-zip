@@ -4,6 +4,7 @@
 
 #import "ZipWithProgress.h"
 
+#import "ZipErrorCodes.h"
 #import "ZipException.h"
 #import "ZipFile.h"
 #import "ZipWriteStream.h"
@@ -41,10 +42,9 @@
 
 - (BOOL) canZipFiles
 {
-   // TODO:JUSTIN - some of these functions don't notify the delegate of an error
-   if (![self insureNoDuplicates]) return NO; // <-- delegate not notified of error
+   if (![self insureNoDuplicates]) return NO;
    if (![self insureSourceFilesExist]) return NO;
-   if (![self insureCanCreateZipFileAtLocation]) return NO;  // <-- delegate not notified of error
+   if (![self insureCanCreateZipFileAtLocation]) return NO;
    if ( [self totalSourceFileSize] == 0) return NO;
    if (![self insureAdequateDiskSpace]) return NO;
    return YES;
@@ -58,7 +58,7 @@
    
    if (self.cancelOperation) return [self setCancelErrorAndCleanup];
    
-   if (![self canZipFiles]) return [self performFileCleanup];;
+   if (![self canZipFiles]) return [self performFileCleanup];
    
    std::map<std::string, std::string>::iterator it = _zipFileMapping.begin();
    for (; it != _zipFileMapping.end(); ++it)
@@ -89,8 +89,9 @@
       }
       else
       {
-         NSString * message = @"Failed to create write stream for zip file";
-         [self setErrorCode:1 errorMessage:message andNotify:YES];
+         [self setErrorCode:kOZEC_WriteStreamCreationError
+               errorMessage:kOZEM_WriteStreamCreationError
+                  andNotify:YES];
          break;
       }
    }
@@ -113,8 +114,9 @@
    else
    {
       [self performZipToolCleanup];
-      NSString * message = @"Failed to get a system queue to execute zip file creation";
-      [self setErrorCode:2 errorMessage:message andNotify:((completion)? NO : YES)];
+      [self setErrorCode:kOZEC_WriteStreamCreationError
+            errorMessage:kOZEM_WriteStreamCreationError
+               andNotify:((completion)? NO : YES)];
       
       if (completion) completion(_zipFileError);
    }
@@ -159,8 +161,22 @@
    std::map<std::string, std::string>::iterator it = _zipFileMapping.begin();
    for( ; it != _zipFileMapping.end(); ++it)
    {
-      if (it->second.length() <= 0) return NO;
-      if (zipFileNames.find(it->second) != zipFileNames.end()) return NO;
+      if (it->second.length() <= 0)
+      {
+         [self setErrorCode:kOZEC_ZeroLengthFileNames
+               errorMessage:kOZEM_ZeroLengthFileNames
+                  andNotify:YES];
+         return NO;
+      }
+      
+      if (zipFileNames.find(it->second) != zipFileNames.end())
+      {
+         [self setErrorCode:kOZEC_DuplicateFileNames
+               errorMessage:kOZEM_DuplicateFileNames
+                  andNotify:YES];
+         return NO;
+      }
+      
       zipFileNames.insert(it->second);
    }
    
@@ -201,40 +217,45 @@
    BOOL isFolder = NO;
    BOOL success = [manager fileExistsAtPath:[folder path] isDirectory:&isFolder];
    if (success == NO || isFolder == NO)
+   {
+      if (isFolder == NO)
+         [self setErrorCode:kOZEC_ZipLocationIsFile
+               errorMessage:kOZEM_ZipLocationIsFile
+                  andNotify:YES];
+      else
+         [self setErrorCode:kOZEC_ZipLocationDoesNotExist
+               errorMessage:kOZEM_ZipLocationDoesNotExist
+                  andNotify:YES];
+      
       return NO;
+   }
    
    NSString * tmpString = [folder path];
    if (![tmpString hasSuffix:@"/"])
       tmpString = [tmpString stringByAppendingString:@"/"];
    
-   return [manager isWritableFileAtPath:tmpString];
+   if ([manager isWritableFileAtPath:tmpString] == NO)
+   {
+      [self setErrorCode:kOZEC_ZipLocationReadOnly
+            errorMessage:kOZEM_ZipLocationReadOnly
+               andNotify:YES];
+      return NO;
+   }
    
    return YES;
 }
 
 - (BOOL) insureAdequateDiskSpace
 {
+   static const NSUInteger freeSpaceBuffer = 1024 * 1000 * 10;
+   
    if (_zipFileURL == nil) return NO;
    
    unsigned long long spaceNeeded = [self totalSourceFileSize];
-   if (spaceNeeded)
-   {
-      NSError * error = nil;
-      NSDictionary * dict = [[NSFileManager defaultManager]
-                             attributesOfFileSystemForPath:[_zipFileURL path] error:&error];
-      
-      if (dict == nil || error != nil)
-      {
-         [self setError:error andNotify:YES];
-         return NO;
-      }
-      
-      unsigned long long freeSpace = [[dict objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
-      if (spaceNeeded >= freeSpace) // TODO:LEA: add a buffer of 10MB or so at least
-         return NO;
-   }
    
-   return YES;
+   return [self insureAdequateDiskSpaceInFolder:_zipFileURL
+                                        forSize:spaceNeeded
+                             andFreeSpaceBuffer:freeSpaceBuffer];
 }
 
 - (void) updateProgress:(unsigned long long) bytesReadFromFile
@@ -321,9 +342,8 @@
          }
          else
          {
-            int err = -19;
-            NSString * reason = @"Failed to read data to add to zip file";
-            @throw [[ZipException alloc] initWithError:err reason:reason];
+            @throw [[ZipException alloc] initWithError:kOZEC_ReadDataFailure
+                                                reason:kOZEM_ReadDataFailure];
          }
          
       } while (totalBytesWritten < bytesInFile);
@@ -338,7 +358,7 @@
    @catch (id e)
    {
       NSString * reason = [e description];
-      [self setErrorCode:1 errorMessage:reason andNotify:YES];
+      [self setErrorCode:kOZCEC_IndeterminateError errorMessage:reason andNotify:YES];
    }
    
    return result;

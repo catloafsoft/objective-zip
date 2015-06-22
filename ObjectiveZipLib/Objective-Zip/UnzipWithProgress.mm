@@ -5,6 +5,7 @@
 #import "UnzipWithProgress.h"
 
 #import "FileInZipInfo.h"
+#import "ZipErrorCodes.h"
 #import "ZipException.h"
 #import "ZipFile.h"
 #import "ZipReadStream.h"
@@ -67,6 +68,8 @@
 
 - (BOOL) unzipOneFile:(NSString *)fileName toLocation:(NSURL *)unzipToFolder
 {
+   static const unsigned long long s_freeSpaceBuffer = 1024 * 1000 * 10; // 10 MB buffer min disk space
+   
    BOOL result = NO;
    
    if (![self insureCanUnzipToLocation:unzipToFolder]) return result;
@@ -89,8 +92,17 @@
    } while ([_zipTool goToNextFileInZip]);
    
    
-   if (readStream == nil || fileInfo == nil) return result;
-   if (![self insureAdequateDiskSpaceInFolder:unzipToFolder forSize:fileInfo.size]) return NO;
+   if (readStream == nil || fileInfo == nil)
+   {
+      [self setErrorCode:kOUZEC_CannotFindInfoForFileInArchive
+            errorMessage:kOUZEM_CannotFindInfoForFileInArchive
+               andNotify:YES];
+      return result;
+   }
+   
+   if (![self insureAdequateDiskSpaceInFolder:unzipToFolder
+                                      forSize:fileInfo.size
+                           andFreeSpaceBuffer:s_freeSpaceBuffer]) return NO;
    
    // extract the file
    _totalDestinationBytesWritten = 0;
@@ -111,10 +123,9 @@
    BOOL success = [manager fileExistsAtPath:[unzipToFolder path] isDirectory:&isFolder];
    if (success == NO || isFolder == NO)
    {
-      // TODO:LEA: Put a valid message and code here
-      int errorCode = 3;
-      NSString * message = @"Extraction path does not exist";
-      [self setErrorCode:errorCode errorMessage:message andNotify:YES];
+      [self setErrorCode:kOUZEC_PathDoesNotExist
+            errorMessage:kOUZEM_PathDoesNotExist
+               andNotify:YES];
       return NO;
    }
    
@@ -147,10 +158,9 @@
    
    if (_extractionURL == nil)
    {
-      // TODO:LEA: Put a valid message and code here
-      int errorCode = 3;
-      NSString * message = @"Could not create folder to extract zip file into";
-      [self setErrorCode:errorCode errorMessage:message andNotify:YES];
+      [self setErrorCode:kOUZEC_CannotCreateFolder
+            errorMessage:kOUZEM_CannotCreateFolder
+               andNotify:YES];
       return NO;
    }
    
@@ -212,8 +222,9 @@
    {
       [self performZipToolCleanup];
       
-      NSString * message = @"Failed to get a system queue to extract date from zip file";
-      [self setErrorCode:2 errorMessage:message andNotify:((completion)? NO : YES)];
+      [self setErrorCode:kOUZEC_CannotCreateExtractionQueue
+            errorMessage:kOUZEM_CannotCreateExtractionQueue
+               andNotify:((completion)? NO : YES)];
       
       if (completion) completion(_extractionURL, _zipFileError);
    }
@@ -278,32 +289,14 @@
    return [manager isWritableFileAtPath:tmpString];
 }
 
-- (BOOL) insureAdequateDiskSpaceInFolder:(NSURL *)folderToUnzipTo
-                                 forSize:(unsigned long long) spaceNeeded
-{
-   static const unsigned long long s_freeSpaceBuffer = 1024 * 10000; // 10 MB buffer min disk space
-   if (spaceNeeded)
-   {
-      NSError * error = nil;
-      NSDictionary * dict = [[NSFileManager defaultManager]
-                             attributesOfFileSystemForPath:[folderToUnzipTo path] error:&error];
-      
-      if (dict == nil || error != nil) return NO;
-      
-      unsigned long long freeSpace =
-      [[dict objectForKey: NSFileSystemFreeSize] unsignedLongLongValue];
-      
-      if (freeSpace < s_freeSpaceBuffer) return NO;
-      if (spaceNeeded >= (freeSpace - s_freeSpaceBuffer)) return NO;
-   }
-   
-   return YES;
-}
-
 - (BOOL) insureAdequateDiskSpace:(NSURL *)folderToUnzipTo
 {
+   static const unsigned long long s_freeSpaceBuffer = 1024 * 1000 * 10; // 10 MB buffer min disk space
+   
    unsigned long long spaceNeeded = [self totalDstinationFileSize];
-   return [self insureAdequateDiskSpaceInFolder:folderToUnzipTo forSize:spaceNeeded];
+   return [self insureAdequateDiskSpaceInFolder:folderToUnzipTo
+                                        forSize:spaceNeeded
+                             andFreeSpaceBuffer:s_freeSpaceBuffer];
 }
 
 - (void) updateProgress:(unsigned long long) bytesReadFromFile
@@ -414,7 +407,7 @@
    @catch (id e)
    {
       NSString * reason = [e description];
-      [self setErrorCode:1 errorMessage:reason andNotify:YES];
+      [self setErrorCode:kOZCEC_IndeterminateError errorMessage:reason andNotify:YES];
    }
    
    [handle closeFile];

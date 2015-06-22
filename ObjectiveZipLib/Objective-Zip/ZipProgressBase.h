@@ -48,6 +48,10 @@
 - (void) setCancelError;
 - (void) setCancelErrorAndCleanup;
 
+- (BOOL) insureAdequateDiskSpaceInFolder:(NSURL *)location
+                                 forSize:(unsigned long long) spaceNeeded
+                      andFreeSpaceBuffer:(unsigned long long) bufferSpaceRemaining;
+
 // public methods
 - (void) setProgressDelegate:(id<ProgressDelegate>)delegate;
 
