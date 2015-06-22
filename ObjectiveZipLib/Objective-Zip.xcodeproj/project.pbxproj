@@ -17,8 +17,8 @@
 		035110001B21CF8D007EA388 /* ZipProgressBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 03510FFD1B21CF8D007EA388 /* ZipProgressBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		035110011B21CF8D007EA388 /* ZipProgressBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 03510FFE1B21CF8D007EA388 /* ZipProgressBase.mm */; };
 		035110021B21CF8D007EA388 /* ZipProgressBase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 03510FFE1B21CF8D007EA388 /* ZipProgressBase.mm */; };
-		03E2DDC01B384E7B00DB2E61 /* ZipErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 03E2DDBF1B384E7B00DB2E61 /* ZipErrorCodes.h */; };
-		03E2DDC11B384E7B00DB2E61 /* ZipErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 03E2DDBF1B384E7B00DB2E61 /* ZipErrorCodes.h */; };
+		03E2DDC01B384E7B00DB2E61 /* ZipErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 03E2DDBF1B384E7B00DB2E61 /* ZipErrorCodes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		03E2DDC11B384E7B00DB2E61 /* ZipErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 03E2DDBF1B384E7B00DB2E61 /* ZipErrorCodes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EAA4E3BF14FD56B70025B561 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAA4E3BE14FD56B70025B561 /* Foundation.framework */; };
 		EAA4E3E514FD58920025B561 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D314FD58920025B561 /* ioapi.c */; };
 		EAA4E3E614FD58920025B561 /* ioapi.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3D414FD58920025B561 /* ioapi.h */; };
