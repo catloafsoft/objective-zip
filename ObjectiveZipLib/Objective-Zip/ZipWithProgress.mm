@@ -199,7 +199,9 @@
       
       if (handle == nil || error != nil)
       {
-         [self setError:error andNotify:YES];
+         [self setErrorCode:kOZEC_fileCouldNotBeOpenedForReading
+               errorMessage:kOZEM_fileCouldNotBeOpenedForReading
+                  andNotify:YES];
          return NO;
       }
    }

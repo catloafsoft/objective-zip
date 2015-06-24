@@ -55,6 +55,9 @@ static NSString * kOZEM_ZipLocationReadOnly = @"Requested location for zip file 
 static NSInteger  kOZEC_ReadDataFailure = 106;
 static NSString * kOZEM_ReadDataFailure = @"Failed to read data to add to zip file";
 
+static NSInteger  kOZEC_fileCouldNotBeOpenedForReading = 107;
+static NSString * kOZEM_fileCouldNotBeOpenedForReading = @"A file to be added to the zip file could not be opened for reading";
+
 
 
 // unzip error codes
