@@ -42,6 +42,7 @@
 - (void) addToFilesCreated:(NSURL *) url;
 - (void) performFileCleanup;
 
+- (void) notifyError:(NSError *)error;
 - (void) setError:(NSError *)error andNotify:(BOOL)notify;
 - (void) setErrorCode:(NSInteger)code errorMessage:(NSString *)message andNotify:(BOOL)notify;
 

@@ -142,7 +142,9 @@
          if (handle == nil || error != nil)
          {
             _totalFileSize = 0;
-            [self setError:error andNotify:YES];
+            [self setErrorCode:kOZEC_fileCouldNotBeOpenedForReading
+                  errorMessage:kOZEM_fileCouldNotBeOpenedForReading
+                     andNotify:YES];
             return _totalFileSize;
          }
          
@@ -294,7 +296,9 @@
    NSFileHandle * handle = [NSFileHandle fileHandleForReadingFromURL:fileToZip  error:&error];
    if (handle == nil || error != nil)
    {
-      [self setError:error andNotify:YES];
+      [self setErrorCode:kOZEC_fileCouldNotBeOpenedForReading
+            errorMessage:kOZEM_fileCouldNotBeOpenedForReading
+               andNotify:YES];
       return result;
    }
    

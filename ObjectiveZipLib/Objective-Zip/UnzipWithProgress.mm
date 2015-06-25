@@ -243,7 +243,7 @@
       NSError * error = nil;
       BOOL result = [[NSFileManager defaultManager] removeItemAtURL:_extractionURL error:&error];
       if (result == NO || error != nil)
-         [self setError:error andNotify:YES];
+         [self notifyError:error];
    }
 }
 
@@ -343,7 +343,9 @@
    
    if (success == NO || error != nil)
    {
-      [self setError:error andNotify:YES];
+      [self setErrorCode:kOUZEC_fileAlreadyExists
+            errorMessage:kOUZEM_fileAlreadyExists
+               andNotify:YES];
       return result;
    }
    
@@ -354,7 +356,9 @@
    NSFileHandle * handle = [NSFileHandle fileHandleForWritingToURL:fullUrl  error:&error];
    if (handle == nil || error != nil)
    {
-      [self setError:error andNotify:YES];
+      [self setErrorCode:kOUZEC_fileCouldNotBeOpenedForWriting
+            errorMessage:kOUZEM_fileCouldNotBeOpenedForWriting
+               andNotify:YES];
       return result;
    }
    
@@ -362,10 +366,9 @@
    
    if (info.size == 0)
    {
-      // zipfile contains a file with 0 byte length?
-      // should we write out the file anyways?
+      // zipfile contains a file with 0 byte length
       [handle closeFile];
-      return result;
+      return YES;
    }
    
    unsigned long long totalBytesWritten = 0;

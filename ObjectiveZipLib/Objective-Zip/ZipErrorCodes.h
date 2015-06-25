@@ -74,4 +74,10 @@ static NSString * kOUZEM_CannotCreateExtractionQueue = @"Failed to get a system 
 static NSInteger  kOUZEC_CannotFindInfoForFileInArchive = 123;
 static NSString * kOUZEM_CannotFindInfoForFileInArchive = @"File does not exist in archive";
 
+static NSInteger  kOUZEC_fileAlreadyExists = 124;
+static NSString * kOUZEM_fileAlreadyExists = @"During file extraction the file to be written already exists";
+
+static NSInteger  kOUZEC_fileCouldNotBeOpenedForWriting = 125;
+static NSString * kOUZEM_fileCouldNotBeOpenedForWriting = @"During file extraction the file to be written could not be opened for writing";
+
 

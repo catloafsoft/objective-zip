@@ -114,7 +114,15 @@
       NSError * error = nil;
       BOOL result = [[NSFileManager defaultManager] removeItemAtURL:url error:&error];
       if (result == NO || error != nil)
-         [self setError:error andNotify:YES];
+         [self notifyError:error];
+   }
+}
+
+- (void) notifyError:(NSError *)error
+{
+   if (_zipDelegate && error)
+   {
+      [_zipDelegate updateError:error];
    }
 }
 
@@ -123,7 +131,7 @@
    if (error)
    {
       _zipFileError = error;
-      if (notify) [_zipDelegate updateError:_zipFileError];
+      if (notify) [self notifyError:_zipFileError];
    }
 }
 
