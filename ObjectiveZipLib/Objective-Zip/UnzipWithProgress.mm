@@ -101,7 +101,7 @@
    }
    
    if (![self insureAdequateDiskSpaceInFolder:unzipToFolder
-                                      forSize:fileInfo.size
+                                      forSize:fileInfo.length
                            andFreeSpaceBuffer:s_freeSpaceBuffer]) return NO;
    
    // extract the file
@@ -269,7 +269,7 @@
    
    NSArray * fileInfoList = [_zipTool listFileInZipInfos];
    for (FileInZipInfo * info in fileInfoList)
-      _totalFileSize += info.size;
+      _totalFileSize += info.length;
    
    return _totalFileSize;
 }
@@ -306,7 +306,7 @@
 {
    if (_zipDelegate == nil) return;
    
-   double progress = (info.size)? static_cast<double>(bytesReadFromFile) / info.size : 0;
+   double progress = (info.length)? static_cast<double>(bytesReadFromFile) / info.length : 0;
    
    // update current file progress
    if ([_zipDelegate respondsToSelector:@selector(updateProgress:forFile:)])
@@ -364,7 +364,7 @@
    
    [handle seekToFileOffset:0];
    
-   if (info.size == 0)
+   if (info.length == 0)
    {
       // zipfile contains a file with 0 byte length
       [handle closeFile];
@@ -385,8 +385,8 @@
       {
          if (self.cancelOperation) break;
          
-         if (bytesToRead > (info.size - totalBytesWritten))
-            bytesToRead = info.size - totalBytesWritten;
+         if (bytesToRead > (info.length - totalBytesWritten))
+            bytesToRead = info.length - totalBytesWritten;
          
          NSData * data = [readStream readDataOfLength:bytesToRead];
          [handle writeData:data];
@@ -398,7 +398,7 @@
                  withFileInfo:info
                singleFileOnly:singleFileOnly];
          
-      } while (totalBytesWritten < info.size);
+      } while (totalBytesWritten < info.length);
       
       result = YES;
    }

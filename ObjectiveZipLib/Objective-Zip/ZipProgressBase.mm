@@ -4,11 +4,8 @@
 
 #import "ZipProgressBase.h"
 
-#import "FileInZipInfo.h"
 #import "ZipErrorCodes.h"
-#import "ZipException.h"
 #import "ZipFile.h"
-#import "ZipReadStream.h"
 
 
 //
