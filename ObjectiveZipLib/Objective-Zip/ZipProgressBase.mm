@@ -4,6 +4,7 @@
 
 #import "ZipProgressBase.h"
 
+#import "ZipException.h"
 #import "ZipErrorCodes.h"
 #import "ZipFile.h"
 
@@ -31,12 +32,12 @@
 {
    if (self = [self init])
    {
+      [self setProgressDelegate:delegate];
+      
       _zipFileURL = [zipFileURL copy];
       _zipFileMode = (ZipFileMode)mode;
       
       if (![self createZipToolIfNeeded]) return nil;
-      
-      [self setProgressDelegate:delegate];
    }
    
    return self;
@@ -63,9 +64,9 @@
       {
          _zipTool = [[ZipFile alloc] initWithFileName:[_zipFileURL path] mode:_zipFileMode];
       }
-      @catch (NSException * exception)
+      @catch (ZipException * exception)
       {
-         [self setErrorCode:10 errorMessage:exception.reason andNotify:YES];
+         [self setErrorCode:exception.error errorMessage:exception.reason andNotify:YES];
          _zipTool = nil;   // something failed during initialization
       }
    }

@@ -60,7 +60,7 @@
 			case ZipFileModeCreate:
 				_zipFile= zipOpen([_fileName cStringUsingEncoding:NSUTF8StringEncoding], APPEND_STATUS_CREATE);
 				if (_zipFile == NULL) {
-					NSString *reason= [NSString stringWithFormat:@"Can't open '%@'", _fileName];
+					NSString *reason= [NSString stringWithFormat:@"Can't create '%@'", _fileName];
 					@throw [[ZipException alloc] initWithReason:reason];
 				}
 				break;
