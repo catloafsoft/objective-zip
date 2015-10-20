@@ -113,7 +113,7 @@
 		EAA4E3E214FD58920025B561 /* ZipReadStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipReadStream.m; sourceTree = "<group>"; };
 		EAA4E3E314FD58920025B561 /* ZipWriteStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipWriteStream.h; sourceTree = "<group>"; };
 		EAA4E3E414FD58920025B561 /* ZipWriteStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipWriteStream.m; sourceTree = "<group>"; };
-		ED2982371BD6C4430034E973 /* libObjective-Zip-OSX copy.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libObjective-Zip-OSX copy.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED2982371BD6C4430034E973 /* libObjective-Zip-OSX-XCEED_ZIP_HACK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libObjective-Zip-OSX-XCEED_ZIP_HACK.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipWithProgress.h; sourceTree = "<group>"; };
 		ED4430A81B18CFDF007A3256 /* ZipWithProgress.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ZipWithProgress.mm; sourceTree = "<group>"; };
 		ED4430C81B191090007A3256 /* libObjective-Zip-OSX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libObjective-Zip-OSX.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,7 +164,7 @@
 			children = (
 				EAA4E3BB14FD56B70025B561 /* libObjective-Zip.a */,
 				ED4430C81B191090007A3256 /* libObjective-Zip-OSX.a */,
-				ED2982371BD6C4430034E973 /* libObjective-Zip-OSX copy.a */,
+				ED2982371BD6C4430034E973 /* libObjective-Zip-OSX-XCEED_ZIP_HACK.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -325,7 +325,7 @@
 			);
 			name = "Objective-Zip-OSX-XCEED_ZIP_HACK";
 			productName = ObjectiveZipLib;
-			productReference = ED2982371BD6C4430034E973 /* libObjective-Zip-OSX copy.a */;
+			productReference = ED2982371BD6C4430034E973 /* libObjective-Zip-OSX-XCEED_ZIP_HACK.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		ED4430AB1B191090007A3256 /* Objective-Zip-OSX */ = {
@@ -552,7 +552,7 @@
 				);
 				GCC_THUMB_SUPPORT = NO;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "Objective-Zip-OSX copy";
+				PRODUCT_NAME = "Objective-Zip-OSX-XCEED_ZIP_HACK";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
@@ -572,7 +572,7 @@
 				);
 				GCC_THUMB_SUPPORT = NO;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "Objective-Zip-OSX copy";
+				PRODUCT_NAME = "Objective-Zip-OSX-XCEED_ZIP_HACK";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
@@ -592,7 +592,7 @@
 				);
 				GCC_THUMB_SUPPORT = NO;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "Objective-Zip-OSX copy";
+				PRODUCT_NAME = "Objective-Zip-OSX-XCEED_ZIP_HACK";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
