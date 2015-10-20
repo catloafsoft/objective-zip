@@ -1067,13 +1067,26 @@ extern int ZEXPORT zipOpenNewFileInZip4_64(zipFile file, const char* filename, c
         zi->ci.size_centralExtraFree += 11; /* Extra space reserved for AES extra info */
 #endif
     zi->ci.central_header = (char*)ALLOC((uInt)zi->ci.size_centralheader + zi->ci.size_centralExtraFree);
+   
+   // moved this check up a bit.
+   // we want to verify that the central_header is allocated  before we start writing to it
+   if (zi->ci.central_header == NULL)
+        return ZIP_INTERNALERROR;
+   
     zi->ci.number_disk = zi->number_disk;
     zi->ci.size_centralExtra = size_extrafield_global;
 
     /* Write central directory header */
     zip64local_putValue_inmemory(zi->ci.central_header, (uLong)CENTRALHEADERMAGIC, 4);
     zip64local_putValue_inmemory(zi->ci.central_header+4, (uLong)versionMadeBy, 2);
+#ifdef EXCEED_COMPATIBILITY_HACK
+    if (method == 0)
+        zip64local_putValue_inmemory(zi->ci.central_header+6, (uLong)10, 2);
+    else
+        zip64local_putValue_inmemory(zi->ci.central_header+6, (uLong)20, 2);
+#else
     zip64local_putValue_inmemory(zi->ci.central_header+6, (uLong)20, 2);
+#endif
     zip64local_putValue_inmemory(zi->ci.central_header+8, (uLong)zi->ci.flag, 2);
     zip64local_putValue_inmemory(zi->ci.central_header+10, (uLong)zi->ci.method, 2);
     zip64local_putValue_inmemory(zi->ci.central_header+12, (uLong)zi->ci.dosDate, 4);
@@ -1108,9 +1121,6 @@ extern int ZEXPORT zipOpenNewFileInZip4_64(zipFile file, const char* filename, c
         *(zi->ci.central_header+SIZECENTRALHEADER+size_filename+
               size_extrafield_global+i) = *(comment+i);
 
-    if (zi->ci.central_header == NULL)
-        return ZIP_INTERNALERROR;
-
     zi->ci.zip64 = zip64;
     zi->ci.totalCompressedData = 0;
     zi->ci.totalUncompressedData = 0;
@@ -1121,10 +1131,17 @@ extern int ZEXPORT zipOpenNewFileInZip4_64(zipFile file, const char* filename, c
 
     if (err == ZIP_OK)
     {
+#ifdef EXCEED_COMPATIBILITY_HACK
+       if (zi->ci.method == 0)
+          err = zip64local_putValue(&zi->z_filefunc, zi->filestream, (uLong)10, 2); /* version needed to extract */
+       else
+          err = zip64local_putValue(&zi->z_filefunc, zi->filestream, (uLong)20, 2); /* version needed to extract */
+#else
         if (zi->ci.zip64)
             err = zip64local_putValue(&zi->z_filefunc, zi->filestream, (uLong)45, 2); /* version needed to extract */
         else
             err = zip64local_putValue(&zi->z_filefunc, zi->filestream, (uLong)20, 2); /* version needed to extract */
+#endif // #ifdef EXCEED_COMPATIBILITY_HACK
     }
     if (err == ZIP_OK)
         err = zip64local_putValue(&zi->z_filefunc, zi->filestream, (uLong)zi->ci.flag, 2);
@@ -1679,7 +1696,12 @@ extern int ZEXPORT zipCloseFileInZipRaw64(zipFile file, ZPOS64_T uncompressed_si
     if (compressed_size >= 0xffffffff || uncompressed_size >= 0xffffffff || zi->ci.pos_local_header >= 0xffffffff)
     {
         zip64local_putValue_inmemory(zi->ci.central_header+4, (uLong)45, 2); /* version made by */
+#ifdef EXCEED_COMPATIBILITY_HACK
+        if (compressed_size != uncompressed_size)
+            zip64local_putValue_inmemory(zi->ci.central_header+6, (uLong)45, 2); /* version needed */
+#else
         zip64local_putValue_inmemory(zi->ci.central_header+6, (uLong)45, 2); /* version needed */
+#endif
     }
     zip64local_putValue_inmemory(zi->ci.central_header+16, crc32, 4); /* crc */
     if (compressed_size >= 0xffffffff)
