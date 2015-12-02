@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EA20847414FD638E00A82683 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20847314FD638E00A82683 /* libz.dylib */; };
 		EAA4E3BF14FD56B70025B561 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAA4E3BE14FD56B70025B561 /* Foundation.framework */; };
 		EAA4E3E514FD58920025B561 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D314FD58920025B561 /* ioapi.c */; };
 		EAA4E3E614FD58920025B561 /* ioapi.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3D414FD58920025B561 /* ioapi.h */; };
@@ -52,6 +51,8 @@
 		EAA4E3E214FD58920025B561 /* ZipReadStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipReadStream.m; sourceTree = "<group>"; };
 		EAA4E3E314FD58920025B561 /* ZipWriteStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipWriteStream.h; sourceTree = "<group>"; };
 		EAA4E3E414FD58920025B561 /* ZipWriteStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipWriteStream.m; sourceTree = "<group>"; };
+		EADE61F61C0EFE5C00D4B6A8 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		EADE61F81C0EFFFB00D4B6A8 /* libz.1.2.5.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.2.5.tbd; path = usr/lib/libz.1.2.5.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,7 +60,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EA20847414FD638E00A82683 /* libz.dylib in Frameworks */,
 				EAA4E3BF14FD56B70025B561 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -89,6 +89,8 @@
 		EAA4E3BD14FD56B70025B561 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EADE61F81C0EFFFB00D4B6A8 /* libz.1.2.5.tbd */,
+				EADE61F61C0EFE5C00D4B6A8 /* libz.tbd */,
 				EA20847314FD638E00A82683 /* libz.dylib */,
 				EAA4E3BE14FD56B70025B561 /* Foundation.framework */,
 			);
@@ -245,7 +247,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Objective-Zip-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lz",
+				);
 				PRODUCT_NAME = "Objective-Zip";
 				SKIP_INSTALL = YES;
 			};
@@ -300,7 +305,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Objective-Zip-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lz",
+				);
 				PRODUCT_NAME = "Objective-Zip";
 				SKIP_INSTALL = YES;
 			};
@@ -313,7 +321,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Objective-Zip-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lz",
+				);
 				PRODUCT_NAME = "Objective-Zip";
 				SKIP_INSTALL = YES;
 			};
