@@ -10,6 +10,7 @@
 
 
 // forward declarations
+@class ZipErrorCodes;
 @class ZipFile;
 
 
@@ -22,6 +23,7 @@
    NSURL *              _zipFileURL;
    NSError *            _zipFileError;
    ZipFile *            _zipTool;
+   ZipErrorCodes *      _zipErrorCodes;
    
    id<ProgressDelegate> _zipDelegate;
    

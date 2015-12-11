@@ -36,6 +36,7 @@
       
       _zipFileURL = [zipFileURL copy];
       _zipFileMode = (ZipFileMode)mode;
+      _zipErrorCodes = [[ZipErrorCodes alloc] init];
       
       if (![self createZipToolIfNeeded]) return nil;
    }
@@ -135,9 +136,9 @@
 
 - (void) setErrorCode:(NSInteger)code errorMessage:(NSString *)message andNotify:(BOOL)notify
 {
-   if (message == nil) message = kOZCEM_IndeterminateError;
+   if (message == nil) message = _zipErrorCodes.OZCEM_IndeterminateError;
    
-   [self setError:[NSError errorWithDomain:kOZCEM_ZipErrorDomain
+   [self setError:[NSError errorWithDomain:_zipErrorCodes.OZCEM_ZipErrorDomain
                                       code:code
                                   userInfo:[NSDictionary
                                             dictionaryWithObject:message
@@ -147,8 +148,8 @@
 
 - (void) setCancelError
 {
-   [self setErrorCode:kOZCEC_UserCancelledError
-         errorMessage:kOZCEM_UserCancelledError
+   [self setErrorCode:_zipErrorCodes.OZCEC_UserCancelledError
+         errorMessage:_zipErrorCodes.OZCEM_UserCancelledError
             andNotify:YES];
 }
 
@@ -170,8 +171,8 @@
       
       if (dict == nil || error != nil)
       {
-         [self setErrorCode:kOZCEC_CannotReadSystemFolderAttributes
-               errorMessage:kOZCEM_CannotReadSystemFolderAttributes
+         [self setErrorCode:_zipErrorCodes.OZCEC_CannotReadSystemFolderAttributes
+               errorMessage:_zipErrorCodes.OZCEM_CannotReadSystemFolderAttributes
                   andNotify:YES];
          return NO;
       }
@@ -181,16 +182,16 @@
       
       if (freeSpace < bufferSpaceRemaining)
       {
-         [self setErrorCode:kOZCEC_NotEnoughDiskSpace
-               errorMessage:kOZCEM_NotEnoughDiskSpace
+         [self setErrorCode:_zipErrorCodes.OZCEC_NotEnoughDiskSpace
+               errorMessage:_zipErrorCodes.OZCEM_NotEnoughDiskSpace
                   andNotify:YES];
          return NO;
       }
       
       if (spaceNeeded >= (freeSpace - bufferSpaceRemaining))
       {
-         [self setErrorCode:kOZCEC_NotEnoughDiskSpace
-               errorMessage:kOZCEM_NotEnoughDiskSpace
+         [self setErrorCode:_zipErrorCodes.OZCEC_NotEnoughDiskSpace
+               errorMessage:_zipErrorCodes.OZCEM_NotEnoughDiskSpace
                   andNotify:YES];
          return NO;
       }

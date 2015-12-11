@@ -662,20 +662,20 @@ extern zipFile ZEXPORT zipOpen4(const void *pathname, int append, ZPOS64_T disk_
     zlib_filefunc64_32_def* pzlib_filefunc64_32_def)
 {
     zip64_internal ziinit;
-    zip64_internal* zi;
-    ZPOS64_T byte_before_the_zipfile;   /* byte before the zipfile, (>0 for sfx)*/
-    ZPOS64_T size_central_dir;          /* size of the central directory  */
-    ZPOS64_T offset_central_dir;        /* offset of start of central directory */
-    ZPOS64_T number_entry_CD;           /* total number of entries in the central dir */
-    ZPOS64_T number_entry;
-    ZPOS64_T central_pos;
-    ZPOS64_T size_central_dir_to_read;
-    uLong uL;
-    uLong size_comment;
+    zip64_internal* zi = NULL;
+    ZPOS64_T byte_before_the_zipfile = 0;   /* byte before the zipfile, (>0 for sfx)*/
+    ZPOS64_T size_central_dir = 0;          /* size of the central directory  */
+    ZPOS64_T offset_central_dir = 0;        /* offset of start of central directory */
+    ZPOS64_T number_entry_CD = 0;           /* total number of entries in the central dir */
+    ZPOS64_T number_entry = 0;
+    ZPOS64_T central_pos = 0;
+    ZPOS64_T size_central_dir_to_read = 0;
+    uLong uL = 0;
+    uLong size_comment = 0;
     size_t buf_size = SIZEDATA_INDATABLOCK;
-    void* buf_read;
+    void* buf_read = NULL;
     int err = ZIP_OK;
-    int mode;
+    int mode = 0;
 
     ziinit.z_filefunc.zseek32_file = NULL;
     ziinit.z_filefunc.ztell32_file = NULL;

@@ -89,8 +89,8 @@
       }
       else
       {
-         [self setErrorCode:kOZEC_WriteStreamCreationError
-               errorMessage:kOZEM_WriteStreamCreationError
+         [self setErrorCode:_zipErrorCodes.OZEC_WriteStreamCreationError
+               errorMessage:_zipErrorCodes.OZEM_WriteStreamCreationError
                   andNotify:YES];
          break;
       }
@@ -114,8 +114,8 @@
    else
    {
       [self performZipToolCleanup];
-      [self setErrorCode:kOZEC_WriteStreamCreationError
-            errorMessage:kOZEM_WriteStreamCreationError
+      [self setErrorCode:_zipErrorCodes.OZEC_WriteStreamCreationError
+            errorMessage:_zipErrorCodes.OZEM_WriteStreamCreationError
                andNotify:((completion)? NO : YES)];
       
       if (completion) completion(_zipFileError);
@@ -142,8 +142,8 @@
          if (handle == nil || error != nil)
          {
             _totalFileSize = 0;
-            [self setErrorCode:kOZEC_fileCouldNotBeOpenedForReading
-                  errorMessage:kOZEM_fileCouldNotBeOpenedForReading
+            [self setErrorCode:_zipErrorCodes.OZEC_fileCouldNotBeOpenedForReading
+                  errorMessage:_zipErrorCodes.OZEM_fileCouldNotBeOpenedForReading
                      andNotify:YES];
             return _totalFileSize;
          }
@@ -165,16 +165,16 @@
    {
       if (it->second.length() <= 0)
       {
-         [self setErrorCode:kOZEC_ZeroLengthFileNames
-               errorMessage:kOZEM_ZeroLengthFileNames
+         [self setErrorCode:_zipErrorCodes.OZEC_ZeroLengthFileNames
+               errorMessage:_zipErrorCodes.OZEM_ZeroLengthFileNames
                   andNotify:YES];
          return NO;
       }
       
       if (zipFileNames.find(it->second) != zipFileNames.end())
       {
-         [self setErrorCode:kOZEC_DuplicateFileNames
-               errorMessage:kOZEM_DuplicateFileNames
+         [self setErrorCode:_zipErrorCodes.OZEC_DuplicateFileNames
+               errorMessage:_zipErrorCodes.OZEM_DuplicateFileNames
                   andNotify:YES];
          return NO;
       }
@@ -201,8 +201,8 @@
       
       if (handle == nil || error != nil)
       {
-         [self setErrorCode:kOZEC_fileCouldNotBeOpenedForReading
-               errorMessage:kOZEM_fileCouldNotBeOpenedForReading
+         [self setErrorCode:_zipErrorCodes.OZEC_fileCouldNotBeOpenedForReading
+               errorMessage:_zipErrorCodes.OZEM_fileCouldNotBeOpenedForReading
                   andNotify:YES];
          return NO;
       }
@@ -223,12 +223,12 @@
    if (success == NO || isFolder == NO)
    {
       if (isFolder == NO)
-         [self setErrorCode:kOZEC_ZipLocationIsFile
-               errorMessage:kOZEM_ZipLocationIsFile
+         [self setErrorCode:_zipErrorCodes.OZEC_ZipLocationIsFile
+               errorMessage:_zipErrorCodes.OZEM_ZipLocationIsFile
                   andNotify:YES];
       else
-         [self setErrorCode:kOZEC_ZipLocationDoesNotExist
-               errorMessage:kOZEM_ZipLocationDoesNotExist
+         [self setErrorCode:_zipErrorCodes.OZEC_ZipLocationDoesNotExist
+               errorMessage:_zipErrorCodes.OZEM_ZipLocationDoesNotExist
                   andNotify:YES];
       
       return NO;
@@ -240,8 +240,8 @@
    
    if ([manager isWritableFileAtPath:tmpString] == NO)
    {
-      [self setErrorCode:kOZEC_ZipLocationReadOnly
-            errorMessage:kOZEM_ZipLocationReadOnly
+      [self setErrorCode:_zipErrorCodes.OZEC_ZipLocationReadOnly
+            errorMessage:_zipErrorCodes.OZEM_ZipLocationReadOnly
                andNotify:YES];
       return NO;
    }
@@ -296,8 +296,8 @@
    NSFileHandle * handle = [NSFileHandle fileHandleForReadingFromURL:fileToZip  error:&error];
    if (handle == nil || error != nil)
    {
-      [self setErrorCode:kOZEC_fileCouldNotBeOpenedForReading
-            errorMessage:kOZEM_fileCouldNotBeOpenedForReading
+      [self setErrorCode:_zipErrorCodes.OZEC_fileCouldNotBeOpenedForReading
+            errorMessage:_zipErrorCodes.OZEM_fileCouldNotBeOpenedForReading
                andNotify:YES];
       return result;
    }
@@ -348,8 +348,8 @@
          }
          else
          {
-            @throw [[ZipException alloc] initWithError:kOZEC_ReadDataFailure
-                                                reason:kOZEM_ReadDataFailure];
+            @throw [[ZipException alloc] initWithError:_zipErrorCodes.OZEC_ReadDataFailure
+                                                reason:_zipErrorCodes.OZEM_ReadDataFailure];
          }
          
       } while (totalBytesWritten < bytesInFile);
@@ -364,7 +364,7 @@
    @catch (id e)
    {
       NSString * reason = [e description];
-      [self setErrorCode:kOZCEC_IndeterminateError errorMessage:reason andNotify:YES];
+      [self setErrorCode:_zipErrorCodes.OZCEC_IndeterminateError errorMessage:reason andNotify:YES];
    }
    
    return result;

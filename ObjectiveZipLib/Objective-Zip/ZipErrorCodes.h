@@ -5,79 +5,78 @@
 #import <Foundation/Foundation.h>
 
 
-// kOZCEC_ - konstant Objective-Zip Common Error Code
-// kOZCEM_ - konstant Objective-Zip Common Error Message
+// OZCEC_ - Objective-Zip Common Error Code
+// OZCEM_ - Objective-Zip Common Error Message
 
-// kOZEC_ - konstant Objective-Zip Error Code
-// kOZEM_ - konstant Objective-Zip Error Message
+// OZEC_ - Objective-Zip Error Code
+// OZEM_ - Objective-Zip Error Message
 
-// kOUZEC_ - konstant Objective-(Un)Zip Error Code
-// kOUZEM_ - konstant Objective-(Un)Zip Error Message
+// OUZEC_ - Objective-(Un)Zip Error Code
+// OUZEM_ - Objective-(Un)Zip Error Message
 
+
+@interface ZipErrorCodes : NSObject
+{
+}
 
 // common error codes
-static NSString * kOZCEM_ZipErrorDomain = @"ZipErrorDomain";
+@property (readonly, copy) NSString * OZCEM_ZipErrorDomain;
 
-static NSInteger  kOZCEC_UserCancelledError = -128;
-static NSString * kOZCEM_UserCancelledError = @"User cancelled error";
+@property (readonly, assign) NSInteger OZCEC_UserCancelledError;
+@property (readonly, copy) NSString * OZCEM_UserCancelledError;
 
-static NSInteger  kOZCEC_IndeterminateError = 90;
-static NSString * kOZCEM_IndeterminateError = @"Unknown failure";
+@property (readonly, assign) NSInteger OZCEC_IndeterminateError;
+@property (readonly, copy) NSString * OZCEM_IndeterminateError;
 
-static NSInteger  kOZCEC_NotEnoughDiskSpace = 98;
-static NSString * kOZCEM_NotEnoughDiskSpace = @"Not enough disk space at requested location";
+@property (readonly, assign) NSInteger OZCEC_NotEnoughDiskSpace;
+@property (readonly, copy) NSString * OZCEM_NotEnoughDiskSpace;
 
-static NSInteger  kOZCEC_CannotReadSystemFolderAttributes = 99;
-static NSString * kOZCEM_CannotReadSystemFolderAttributes = @"Cannot read folder attributes to verify disk space";
-
-
+@property (readonly, assign) NSInteger OZCEC_CannotReadSystemFolderAttributes;
+@property (readonly, copy) NSString * OZCEM_CannotReadSystemFolderAttributes;
 
 // zip error codes
+@property (readonly, assign) NSInteger OZEC_WriteStreamCreationError;
+@property (readonly, copy) NSString * OZEM_WriteStreamCreationError;
 
-static NSInteger  kOZEC_WriteStreamCreationError = 100;
-static NSString * kOZEM_WriteStreamCreationError = @"Failed to create write stream for zip file";
+@property (readonly, assign) NSInteger OZEC_ZeroLengthFileNames;
+@property (readonly, copy) NSString * OZEM_ZeroLengthFileNames;
 
-static NSInteger  kOZEC_ZeroLengthFileNames = 101;
-static NSString * kOZEM_ZeroLengthFileNames = @"Cannot create a zip file with file names of zero length";
+@property (readonly, assign) NSInteger OZEC_DuplicateFileNames;
+@property (readonly, copy) NSString * OZEM_DuplicateFileNames;
 
-static NSInteger  kOZEC_DuplicateFileNames = 102;
-static NSString * kOZEM_DuplicateFileNames = @"Cannot create a zip file with duplicate file names";
+@property (readonly, assign) NSInteger OZEC_ZipLocationIsFile;
+@property (readonly, copy) NSString * OZEM_ZipLocationIsFile;
 
-static NSInteger  kOZEC_ZipLocationIsFile = 103;
-static NSString * kOZEM_ZipLocationIsFile = @"Cannot create a zip file at requested location (is a file, not a folder)";
+@property (readonly, assign) NSInteger OZEC_ZipLocationDoesNotExist;
+@property (readonly, copy) NSString * OZEM_ZipLocationDoesNotExist;
 
-static NSInteger  kOZEC_ZipLocationDoesNotExist = 104;
-static NSString * kOZEM_ZipLocationDoesNotExist = @"Requested location for zip file does not exist";
+@property (readonly, assign) NSInteger OZEC_ZipLocationReadOnly;
+@property (readonly, copy) NSString * OZEM_ZipLocationReadOnly;
 
-static NSInteger  kOZEC_ZipLocationReadOnly = 105;
-static NSString * kOZEM_ZipLocationReadOnly = @"Requested location for zip file is read only";
+@property (readonly, assign) NSInteger OZEC_ReadDataFailure;
+@property (readonly, copy) NSString * OZEM_ReadDataFailure;
 
-static NSInteger  kOZEC_ReadDataFailure = 106;
-static NSString * kOZEM_ReadDataFailure = @"Failed to read data to add to zip file";
-
-static NSInteger  kOZEC_fileCouldNotBeOpenedForReading = 107;
-static NSString * kOZEM_fileCouldNotBeOpenedForReading = @"A file to be added to the zip file could not be opened for reading";
-
+@property (readonly, assign) NSInteger OZEC_fileCouldNotBeOpenedForReading;
+@property (readonly, copy) NSString * OZEM_fileCouldNotBeOpenedForReading;
 
 
 // unzip error codes
+@property (readonly, assign) NSInteger OUZEC_PathDoesNotExist;
+@property (readonly, copy) NSString * OUZEM_PathDoesNotExist;
 
-static NSInteger  kOUZEC_PathDoesNotExist = 120;
-static NSString * kOUZEM_PathDoesNotExist = @"Extraction path does not exist";
+@property (readonly, assign) NSInteger OUZEC_CannotCreateFolder;
+@property (readonly, copy) NSString * OUZEM_CannotCreateFolder;
 
-static NSInteger  kOUZEC_CannotCreateFolder = 121;
-static NSString * kOUZEM_CannotCreateFolder = @"Could not create folder to extract files into";
+@property (readonly, assign) NSInteger OUZEC_CannotCreateExtractionQueue;
+@property (readonly, copy) NSString * OUZEM_CannotCreateExtractionQueue;
 
-static NSInteger  kOUZEC_CannotCreateExtractionQueue = 122;
-static NSString * kOUZEM_CannotCreateExtractionQueue = @"Failed to get a system queue to extract data from zip file";
+@property (readonly, assign) NSInteger OUZEC_CannotFindInfoForFileInArchive;
+@property (readonly, copy) NSString * OUZEM_CannotFindInfoForFileInArchive;
 
-static NSInteger  kOUZEC_CannotFindInfoForFileInArchive = 123;
-static NSString * kOUZEM_CannotFindInfoForFileInArchive = @"File does not exist in archive";
+@property (readonly, assign) NSInteger OUZEC_fileAlreadyExists;
+@property (readonly, copy) NSString * OUZEM_fileAlreadyExists;
 
-static NSInteger  kOUZEC_fileAlreadyExists = 124;
-static NSString * kOUZEM_fileAlreadyExists = @"During file extraction the file to be written already exists";
+@property (readonly, assign) NSInteger OUZEC_fileCouldNotBeOpenedForWriting;
+@property (readonly, copy) NSString * OUZEM_fileCouldNotBeOpenedForWriting;
 
-static NSInteger  kOUZEC_fileCouldNotBeOpenedForWriting = 125;
-static NSString * kOUZEM_fileCouldNotBeOpenedForWriting = @"During file extraction the file to be written could not be opened for writing";
-
-
+@end
