@@ -149,7 +149,7 @@
 /* Begin PBXFileReference section */
 		0335846E1C1B341D00F9F7F1 /* ObjectiveZip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectiveZip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		033584A91C1B5C6400F9F7F1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/usr/lib/libz.dylib; sourceTree = DEVELOPER_DIR; };
-		0335851F1C1B602400F9F7F1 /* ObjectiveZip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectiveZip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0335851F1C1B602400F9F7F1 /* ObjectiveZip_XCEED_ZIP_HACK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ObjectiveZip_XCEED_ZIP_HACK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		033585231C1B624F00F9F7F1 /* ObjectiveZip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjectiveZip.h; path = "Objective-Zip/ObjectiveZip.h"; sourceTree = SOURCE_ROOT; tabWidth = 1; };
 		033585251C1B62B600F9F7F1 /* ObjectiveZip-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "ObjectiveZip-Info.plist"; path = "Objective-Zip/ObjectiveZip-Info.plist"; sourceTree = SOURCE_ROOT; };
 		0335852E1C1B6D6900F9F7F1 /* ZipErrorCodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipErrorCodes.m; sourceTree = "<group>"; };
@@ -247,7 +247,7 @@
 				ED4430C81B191090007A3256 /* libObjective-Zip-OSX.a */,
 				ED2982371BD6C4430034E973 /* libObjective-Zip-OSX-XCEED_ZIP_HACK.a */,
 				0335846E1C1B341D00F9F7F1 /* ObjectiveZip.framework */,
-				0335851F1C1B602400F9F7F1 /* ObjectiveZip.framework */,
+				0335851F1C1B602400F9F7F1 /* ObjectiveZip_XCEED_ZIP_HACK.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -458,7 +458,7 @@
 			);
 			name = ObjectiveZip_XCEED_ZIP_HACK;
 			productName = ObjectiveZip;
-			productReference = 0335851F1C1B602400F9F7F1 /* ObjectiveZip.framework */;
+			productReference = 0335851F1C1B602400F9F7F1 /* ObjectiveZip_XCEED_ZIP_HACK.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		EAA4E3BA14FD56B70025B561 /* Objective-Zip */ = {
@@ -845,7 +845,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = ObjectiveZip;
+				PRODUCT_NAME = ObjectiveZip_XCEED_ZIP_HACK;
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/Headers";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -896,7 +896,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = ObjectiveZip;
+				PRODUCT_NAME = ObjectiveZip_XCEED_ZIP_HACK;
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/Headers";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -947,7 +947,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = ObjectiveZip;
+				PRODUCT_NAME = ObjectiveZip_XCEED_ZIP_HACK;
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/Headers";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
