@@ -2,9 +2,6 @@
 //  ObjectiveZip.h
 //  ObjectiveZip
 //
-//  Created by Leif Alton on 12/11/15.
-//
-//
 
 #import <Cocoa/Cocoa.h>
 
@@ -18,6 +15,5 @@ FOUNDATION_EXPORT const unsigned char ObjectiveZipVersionString[];
 #import <ObjectiveZip/ProgressDelegate.h>
 #import <ObjectiveZip/UnzipWithProgress.h>
 #import <ObjectiveZip/ZipErrorCodes.h>
-#import <ObjectiveZip/ZipException.h>
 #import <ObjectiveZip/ZipProgressBase.h>
 #import <ObjectiveZip/ZipWithProgress.h>

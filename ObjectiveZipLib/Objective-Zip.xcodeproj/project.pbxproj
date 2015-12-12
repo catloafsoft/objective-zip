@@ -59,8 +59,6 @@
 		033585161C1B602400F9F7F1 /* ZipException.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DD14FD58920025B561 /* ZipException.h */; };
 		033585171C1B602400F9F7F1 /* FileInZipInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3DB14FD58920025B561 /* FileInZipInfo.h */; };
 		033585181C1B602400F9F7F1 /* ZipWithProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		033585241C1B624F00F9F7F1 /* ObjectiveZip.h in Headers */ = {isa = PBXBuildFile; fileRef = 033585231C1B624F00F9F7F1 /* ObjectiveZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		0335852D1C1B6BA900F9F7F1 /* ObjectiveZip.h in Headers */ = {isa = PBXBuildFile; fileRef = 033585231C1B624F00F9F7F1 /* ObjectiveZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0335852F1C1B6D6900F9F7F1 /* ZipErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 0335852E1C1B6D6900F9F7F1 /* ZipErrorCodes.m */; };
 		033585301C1B6D6900F9F7F1 /* ZipErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 0335852E1C1B6D6900F9F7F1 /* ZipErrorCodes.m */; };
 		033585311C1B6D6900F9F7F1 /* ZipErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 0335852E1C1B6D6900F9F7F1 /* ZipErrorCodes.m */; };
@@ -95,6 +93,8 @@
 		EAA4E3F414FD58920025B561 /* ZipReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3E214FD58920025B561 /* ZipReadStream.m */; };
 		EAA4E3F514FD58920025B561 /* ZipWriteStream.h in Headers */ = {isa = PBXBuildFile; fileRef = EAA4E3E314FD58920025B561 /* ZipWriteStream.h */; };
 		EAA4E3F614FD58920025B561 /* ZipWriteStream.m in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3E414FD58920025B561 /* ZipWriteStream.m */; };
+		ED0125361C1BE7CD0026C003 /* ObjectiveZip_XCEED_ZIP_HACK.h in Headers */ = {isa = PBXBuildFile; fileRef = ED0125351C1BE7CD0026C003 /* ObjectiveZip_XCEED_ZIP_HACK.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ED0125371C1BE7D90026C003 /* ObjectiveZip.h in Headers */ = {isa = PBXBuildFile; fileRef = 033585231C1B624F00F9F7F1 /* ObjectiveZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ED2982171BD6C4430034E973 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D314FD58920025B561 /* ioapi.c */; };
 		ED2982181BD6C4430034E973 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D714FD58920025B561 /* unzip.c */; };
 		ED2982191BD6C4430034E973 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = EAA4E3D914FD58920025B561 /* zip.c */; };
@@ -178,6 +178,7 @@
 		EAA4E3E214FD58920025B561 /* ZipReadStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipReadStream.m; sourceTree = "<group>"; };
 		EAA4E3E314FD58920025B561 /* ZipWriteStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipWriteStream.h; sourceTree = "<group>"; };
 		EAA4E3E414FD58920025B561 /* ZipWriteStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipWriteStream.m; sourceTree = "<group>"; };
+		ED0125351C1BE7CD0026C003 /* ObjectiveZip_XCEED_ZIP_HACK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjectiveZip_XCEED_ZIP_HACK.h; path = "Objective-Zip/ObjectiveZip_XCEED_ZIP_HACK.h"; sourceTree = SOURCE_ROOT; };
 		ED2982371BD6C4430034E973 /* libObjective-Zip-OSX-XCEED_ZIP_HACK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libObjective-Zip-OSX-XCEED_ZIP_HACK.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED4430A71B18CFDF007A3256 /* ZipWithProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipWithProgress.h; sourceTree = "<group>"; };
 		ED4430A81B18CFDF007A3256 /* ZipWithProgress.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ZipWithProgress.mm; sourceTree = "<group>"; };
@@ -265,6 +266,7 @@
 			isa = PBXGroup;
 			children = (
 				033585231C1B624F00F9F7F1 /* ObjectiveZip.h */,
+				ED0125351C1BE7CD0026C003 /* ObjectiveZip_XCEED_ZIP_HACK.h */,
 				033585251C1B62B600F9F7F1 /* ObjectiveZip-Info.plist */,
 				EAA4E3C214FD56B70025B561 /* Objective-Zip-Prefix.pch */,
 			);
@@ -321,9 +323,9 @@
 			files = (
 				0335849D1C1B387100F9F7F1 /* ZipErrorCodes.h in Headers */,
 				033584A11C1B38BD00F9F7F1 /* ZipReadStream.h in Headers */,
-				033585241C1B624F00F9F7F1 /* ObjectiveZip.h in Headers */,
 				0335849C1C1B386700F9F7F1 /* UnzipWithProgress.h in Headers */,
 				033584A71C1B398700F9F7F1 /* zip.h in Headers */,
+				ED0125371C1BE7D90026C003 /* ObjectiveZip.h in Headers */,
 				033584A41C1B396D00F9F7F1 /* crypt.h in Headers */,
 				033584A31C1B38D900F9F7F1 /* ZipWriteStream.h in Headers */,
 				033584A01C1B389E00F9F7F1 /* ZipProgressBase.h in Headers */,
@@ -342,10 +344,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				0335850A1C1B602400F9F7F1 /* ZipErrorCodes.h in Headers */,
+				ED0125361C1BE7CD0026C003 /* ObjectiveZip_XCEED_ZIP_HACK.h in Headers */,
 				0335850B1C1B602400F9F7F1 /* ZipReadStream.h in Headers */,
 				0335850C1C1B602400F9F7F1 /* UnzipWithProgress.h in Headers */,
 				0335850D1C1B602400F9F7F1 /* zip.h in Headers */,
-				0335852D1C1B6BA900F9F7F1 /* ObjectiveZip.h in Headers */,
 				0335850E1C1B602400F9F7F1 /* crypt.h in Headers */,
 				0335850F1C1B602400F9F7F1 /* ZipWriteStream.h in Headers */,
 				033585101C1B602400F9F7F1 /* ZipProgressBase.h in Headers */,
