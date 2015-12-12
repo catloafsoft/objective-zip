@@ -36,7 +36,6 @@
       
       _zipFileURL = [zipFileURL copy];
       _zipFileMode = (ZipFileMode)mode;
-      _zipErrorCodes = [[ZipErrorCodes alloc] init];
       
       if (![self createZipToolIfNeeded]) return nil;
    }
@@ -136,9 +135,9 @@
 
 - (void) setErrorCode:(NSInteger)code errorMessage:(NSString *)message andNotify:(BOOL)notify
 {
-   if (message == nil) message = _zipErrorCodes.OZCEM_IndeterminateError;
+   if (message == nil) message = ZipErrorCodes.OZCEM_Indeterminate;
    
-   [self setError:[NSError errorWithDomain:_zipErrorCodes.OZCEM_ZipErrorDomain
+   [self setError:[NSError errorWithDomain:ZipErrorCodes.OZCEM_ZipErrorDomain
                                       code:code
                                   userInfo:[NSDictionary
                                             dictionaryWithObject:message
@@ -148,8 +147,8 @@
 
 - (void) setCancelError
 {
-   [self setErrorCode:_zipErrorCodes.OZCEC_UserCancelledError
-         errorMessage:_zipErrorCodes.OZCEM_UserCancelledError
+   [self setErrorCode:ZipErrorCodes.OZCEC_UserCancelled
+         errorMessage:ZipErrorCodes.OZCEM_UserCancelled
             andNotify:YES];
 }
 
@@ -171,8 +170,8 @@
       
       if (dict == nil || error != nil)
       {
-         [self setErrorCode:_zipErrorCodes.OZCEC_CannotReadSystemFolderAttributes
-               errorMessage:_zipErrorCodes.OZCEM_CannotReadSystemFolderAttributes
+         [self setErrorCode:ZipErrorCodes.OZCEC_CannotReadSystemFolderAttributes
+               errorMessage:ZipErrorCodes.OZCEM_CannotReadSystemFolderAttributes
                   andNotify:YES];
          return NO;
       }
@@ -182,16 +181,16 @@
       
       if (freeSpace < bufferSpaceRemaining)
       {
-         [self setErrorCode:_zipErrorCodes.OZCEC_NotEnoughDiskSpace
-               errorMessage:_zipErrorCodes.OZCEM_NotEnoughDiskSpace
+         [self setErrorCode:ZipErrorCodes.OZCEC_NotEnoughDiskSpace
+               errorMessage:ZipErrorCodes.OZCEM_NotEnoughDiskSpace
                   andNotify:YES];
          return NO;
       }
       
       if (spaceNeeded >= (freeSpace - bufferSpaceRemaining))
       {
-         [self setErrorCode:_zipErrorCodes.OZCEC_NotEnoughDiskSpace
-               errorMessage:_zipErrorCodes.OZCEM_NotEnoughDiskSpace
+         [self setErrorCode:ZipErrorCodes.OZCEC_NotEnoughDiskSpace
+               errorMessage:ZipErrorCodes.OZCEM_NotEnoughDiskSpace
                   andNotify:YES];
          return NO;
       }

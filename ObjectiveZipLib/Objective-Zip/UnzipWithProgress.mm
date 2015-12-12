@@ -94,8 +94,8 @@
    
    if (readStream == nil || fileInfo == nil)
    {
-      [self setErrorCode:_zipErrorCodes.OUZEC_CannotFindInfoForFileInArchive
-            errorMessage:_zipErrorCodes.OUZEM_CannotFindInfoForFileInArchive
+      [self setErrorCode:ZipErrorCodes.OUZEC_CannotFindInfoForFileInArchive
+            errorMessage:ZipErrorCodes.OUZEM_CannotFindInfoForFileInArchive
                andNotify:YES];
       return result;
    }
@@ -123,8 +123,8 @@
    BOOL success = [manager fileExistsAtPath:[unzipToFolder path] isDirectory:&isFolder];
    if (success == NO || isFolder == NO)
    {
-      [self setErrorCode:_zipErrorCodes.OUZEC_PathDoesNotExist
-            errorMessage:_zipErrorCodes.OUZEM_PathDoesNotExist
+      [self setErrorCode:ZipErrorCodes.OUZEC_PathDoesNotExist
+            errorMessage:ZipErrorCodes.OUZEM_PathDoesNotExist
                andNotify:YES];
       return NO;
    }
@@ -158,8 +158,8 @@
    
    if (_extractionURL == nil)
    {
-      [self setErrorCode:_zipErrorCodes.OUZEC_CannotCreateFolder
-            errorMessage:_zipErrorCodes.OUZEM_CannotCreateFolder
+      [self setErrorCode:ZipErrorCodes.OUZEC_CannotCreateFolder
+            errorMessage:ZipErrorCodes.OUZEM_CannotCreateFolder
                andNotify:YES];
       return NO;
    }
@@ -222,8 +222,8 @@
    {
       [self performZipToolCleanup];
       
-      [self setErrorCode:_zipErrorCodes.OUZEC_CannotCreateExtractionQueue
-            errorMessage:_zipErrorCodes.OUZEM_CannotCreateExtractionQueue
+      [self setErrorCode:ZipErrorCodes.OUZEC_CannotCreateExtractionQueue
+            errorMessage:ZipErrorCodes.OUZEM_CannotCreateExtractionQueue
                andNotify:((completion)? NO : YES)];
       
       if (completion) completion(_extractionURL, _zipFileError);
@@ -343,8 +343,8 @@
    
    if (success == NO || error != nil)
    {
-      [self setErrorCode:_zipErrorCodes.OUZEC_fileAlreadyExists
-            errorMessage:_zipErrorCodes.OUZEM_fileAlreadyExists
+      [self setErrorCode:ZipErrorCodes.OUZEC_FileAlreadyExists
+            errorMessage:ZipErrorCodes.OUZEM_FileAlreadyExists
                andNotify:YES];
       return result;
    }
@@ -356,8 +356,8 @@
    NSFileHandle * handle = [NSFileHandle fileHandleForWritingToURL:fullUrl  error:&error];
    if (handle == nil || error != nil)
    {
-      [self setErrorCode:_zipErrorCodes.OUZEC_fileCouldNotBeOpenedForWriting
-            errorMessage:_zipErrorCodes.OUZEM_fileCouldNotBeOpenedForWriting
+      [self setErrorCode:ZipErrorCodes.OUZEC_FileCouldNotBeOpenedForWriting
+            errorMessage:ZipErrorCodes.OUZEM_FileCouldNotBeOpenedForWriting
                andNotify:YES];
       return result;
    }
@@ -410,7 +410,7 @@
    @catch (id e)
    {
       NSString * reason = [e description];
-      [self setErrorCode:_zipErrorCodes.OZCEC_IndeterminateError errorMessage:reason andNotify:YES];
+      [self setErrorCode:ZipErrorCodes.OZCEC_Indeterminate errorMessage:reason andNotify:YES];
    }
    
    [handle closeFile];
