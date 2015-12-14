@@ -12,6 +12,7 @@
 
 #include <set>
 
+
 //
 // UnzipWithProgress private interface
 //
@@ -140,7 +141,8 @@
    {
       NSError * error = nil;
       NSString * folder =
-         (loopCount > 1)? [NSString stringWithFormat:@"%@ %u", folderPart, loopCount] : folderPart;
+         (loopCount > 1)? [NSString stringWithFormat:NEVER_TRANSLATE(@"%@ %u"), folderPart, loopCount]
+                        : folderPart;
       
       NSURL * fullPath = [unzipToFolder URLByAppendingPathComponent:folder isDirectory:YES];
       
@@ -283,8 +285,8 @@
       return NO;
    
    NSString * tmpString = [folderToUnzipTo path];
-   if (![tmpString hasSuffix:@"/"])
-      tmpString = [tmpString stringByAppendingString:@"/"];
+   if (![tmpString hasSuffix:NEVER_TRANSLATE(@"/")])
+      tmpString = [tmpString stringByAppendingString:NEVER_TRANSLATE(@"/")];
    
    return [manager isWritableFileAtPath:tmpString];
 }

@@ -34,6 +34,11 @@
 #import <Foundation/Foundation.h>
 
 
+#ifndef NEVER_TRANSLATE
+   #define NEVER_TRANSLATE(x) x
+#endif
+
+
 @interface ZipException : NSException {
 	
 @private	

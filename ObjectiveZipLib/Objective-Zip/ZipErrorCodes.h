@@ -35,6 +35,24 @@
 +(NSInteger) OZCEC_CannotReadSystemFolderAttributes;
 +(NSString*) OZCEM_CannotReadSystemFolderAttributes;
 
++(NSInteger) OZCEC_CannotOpenFileInArchive;
++(NSString*) OZCEM_CannotOpenFileInArchive;
+
++(NSInteger) OZCEC_CannotCloseFileInArchive;
++(NSString*) OZCEM_CannotCloseFileInArchive;
+
++(NSInteger) OZCEC_CannotCreateZipFile;
++(NSString*) OZCEM_CannotCreateZipFile;
+
++(NSInteger) OZCEC_CannotOpenZipFile;
++(NSString*) OZCEM_CannotOpenZipFile;
+
++(NSInteger) OZCEC_CannotCloseZipFile;
++(NSString*) OZCEM_CannotCloseZipFile;
+
++(NSInteger) OZCEC_UnknownZipFileMode;
++(NSString*) OZCEM_UnknownZipFileMode;
+
 
 // zip error codes
 +(NSInteger) OZEC_WriteStreamCreation;
@@ -61,6 +79,12 @@
 +(NSInteger) OZEC_FileCouldNotBeOpenedForReading;
 +(NSString*) OZEM_FileCouldNotBeOpenedForReading;
 
++(NSInteger) OZEC_CannotWriteFileInArchive;
++(NSString*) OZEM_CannotWriteFileInArchive;
+
++(NSInteger) OZEC_OperationNotPermitted;
++(NSString*) OZEM_OperationNotPermitted;
+
 
 // unzip error codes
 +(NSInteger) OUZEC_PathDoesNotExist;
@@ -80,5 +104,27 @@
 
 +(NSInteger) OUZEC_FileCouldNotBeOpenedForWriting;
 +(NSString*) OUZEM_FileCouldNotBeOpenedForWriting;
+
++(NSInteger) OUZEC_CannotReadFileInArchive;
++(NSString*) OUZEM_CannotReadFileInArchive;
+
++(NSInteger) OUZEC_OperationNotPermitted;
++(NSString*) OUZEM_OperationNotPermitted;
+
++(NSInteger) OUZEC_CannotGetGlobalInfo;
++(NSString*) OUZEM_CannotGetGlobalInfo;
+
++(NSInteger) OUZEC_CannotGoToFirstFileInArchive;
++(NSString*) OUZEM_CannotGoToFirstFileInArchive;
+
++(NSInteger) OUZEC_CannotGoToNextFileInArchive;
++(NSString*) OUZEM_CannotGoToNextFileInArchive;
+
++(NSInteger) OUZEC_CannotGetCurrentFileInfoInArchive;
++(NSString*) OUZEM_CannotGetCurrentFileInfoInArchive;
+
++(NSInteger) OUZEC_CannotOpenCurrentFileInArchive;
++(NSString*) OUZEM_CannotOpenCurrentFileInArchive;
+
 
 @end

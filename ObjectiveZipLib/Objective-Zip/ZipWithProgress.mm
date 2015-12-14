@@ -235,8 +235,8 @@
    }
    
    NSString * tmpString = [folder path];
-   if (![tmpString hasSuffix:@"/"])
-      tmpString = [tmpString stringByAppendingString:@"/"];
+   if (![tmpString hasSuffix:NEVER_TRANSLATE(@"/")])
+      tmpString = [tmpString stringByAppendingString:NEVER_TRANSLATE(@"/")];
    
    if ([manager isWritableFileAtPath:tmpString] == NO)
    {

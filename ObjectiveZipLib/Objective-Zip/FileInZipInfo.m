@@ -32,7 +32,7 @@
 //
 
 #import "FileInZipInfo.h"
-
+#import "ZipException.h"
 
 @implementation FileInZipInfo
 
@@ -51,7 +51,12 @@
 }
 
 - (NSString *) description {
-    return [NSString stringWithFormat:@"<FileInZip: name=%@,length=%lu,compLevel=%d,crypted=%d,size=%lu>",_name,(unsigned long)_length,_level,_crypted,(unsigned long)_size];
+    return [NSString stringWithFormat:NEVER_TRANSLATE(@"<FileInZip: name=%@,length=%lu,compLevel=%d,crypted=%d,size=%lu>"),
+            _name,
+            (unsigned long)_length,
+            _level,
+            _crypted,
+            (unsigned long)_size];
 }
 
 @synthesize name= _name;
