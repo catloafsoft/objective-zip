@@ -126,5 +126,6 @@
 +(NSInteger) OUZEC_CannotOpenCurrentFileInArchive;
 +(NSString*) OUZEM_CannotOpenCurrentFileInArchive;
 
++(BOOL) setErrorString:(NSString *)errorString forCode:(NSInteger)errorCode;
 
 @end
