@@ -117,7 +117,7 @@
    return result;
 }
 
-- (BOOL) createUnZipFolderAtURL:(NSURL *)unzipToFolder
+- (BOOL) createUnZipFolderAtURL:(NSURL *)unzipToFolder withFolderName:(NSString*)folderName
 {
    NSFileManager * manager = [NSFileManager defaultManager];
    BOOL isFolder = NO;
@@ -132,8 +132,16 @@
    
    if (_extractionURL) _extractionURL = nil;
    
-   NSString *pathOfNewFolder = [[_zipFileURL URLByDeletingPathExtension] path];
-   NSString *folderPart = [pathOfNewFolder lastPathComponent];
+   NSString *folderPart;
+   if (folderName && ![folderName isEqualToString:@""])
+   {
+      folderPart = folderName;
+   }
+   else
+   {
+      NSString *pathOfNewFolder = [[_zipFileURL URLByDeletingPathExtension] path];
+      folderPart = [pathOfNewFolder lastPathComponent];
+   }
 
    unsigned loopCount = 1;
    
@@ -169,13 +177,13 @@
    return YES;
 }
 
-- (void) unzipToLocation:(NSURL *)unzipToFolder
+- (void) unzipToLocation:(NSURL *)unzipToFolder withFolderName:(NSString *)folderName
 {
    if (![self prepareForOperation]) return;
    
    if (self.cancelOperation) return [self setCancelErrorAndCleanup];
    
-   if ([self createUnZipFolderAtURL:unzipToFolder] == NO) return;
+   if ([self createUnZipFolderAtURL:unzipToFolder withFolderName:folderName] == NO) return;
                            
    if ([self insureAdequateDiskSpace:unzipToFolder] == NO)  return;
    
@@ -205,6 +213,7 @@
 }
 
 - (void) unzipToLocation:(NSURL *)unzipToFolder
+          withFolderName:(NSString *)folderName
      withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion
 {
    self.cancelOperation = NO;
@@ -214,7 +223,7 @@
    {
       dispatch_async(queue,
                      ^{
-                        [self unzipToLocation:unzipToFolder];
+                        [self unzipToLocation:unzipToFolder withFolderName:folderName];
                         [self performZipToolCleanup];
                         if (completion) completion(_extractionURL, _zipFileError);
                      });
@@ -230,6 +239,12 @@
       
       if (completion) completion(_extractionURL, _zipFileError);
    }
+}
+
+- (void) unzipToLocation:(NSURL *)unzipToFolder
+     withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion
+{
+   [self unzipToLocation:unzipToFolder withFolderName:nil withCompletionBlock:completion];
 }
 
 

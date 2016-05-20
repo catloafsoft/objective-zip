@@ -31,5 +31,8 @@
 - (BOOL) canUnzipToLocation:(NSURL *)unzipToFolder;
 - (void) unzipToLocation:(NSURL *)unzipToFolder
      withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion;
+- (void) unzipToLocation:(NSURL *)unzipToFolder
+          withFolderName:(NSString *)folderName
+     withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion;
 
 @end
