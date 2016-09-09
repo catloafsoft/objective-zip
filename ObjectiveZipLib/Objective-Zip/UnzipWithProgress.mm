@@ -241,13 +241,6 @@
    }
 }
 
-- (void) unzipToLocation:(NSURL *)unzipToFolder
-     withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion
-{
-   [self unzipToLocation:unzipToFolder withFolderName:nil withCompletionBlock:completion];
-}
-
-
 #pragma mark helpers
 
 - (void) performFileCleanup
