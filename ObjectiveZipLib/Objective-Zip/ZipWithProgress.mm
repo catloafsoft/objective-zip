@@ -234,13 +234,13 @@
       return NO;
    }
    
-   if ([manager isWritableFileAtPath:[_zipFileURL path]] == NO)
-   {
-      [self setErrorCode:ZipErrorCodes.OZEC_ZipLocationReadOnly
-            errorMessage:ZipErrorCodes.OZEM_ZipLocationReadOnly
-               andNotify:YES];
-      return NO;
-   }
+//   if ([manager isWritableFileAtPath:[_zipFileURL path]] == NO)
+//   {
+//      [self setErrorCode:ZipErrorCodes.OZEC_ZipLocationReadOnly
+//            errorMessage:ZipErrorCodes.OZEM_ZipLocationReadOnly
+//               andNotify:YES];
+//      return NO;
+//   }
    
    return YES;
 }
