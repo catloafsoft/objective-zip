@@ -132,27 +132,17 @@
    
    if (_extractionURL) _extractionURL = nil;
    
-   unsigned loopCount = 1;
-   
-   do
-   {
-      NSError * error = nil;
+   NSError * error = nil;
 
-      NSURL * fullPath = destinationFolder;
-      
-      success = [manager createDirectoryAtPath:[fullPath path]
-                   withIntermediateDirectories:NO
-                                    attributes:nil
-                                         error:&error];
-      if (success == NO || error != nil)
-         ++loopCount;
-      else
-         _extractionURL = fullPath;
-      
-   }
-   while (_extractionURL == nil && loopCount < 1000 && false);
+   NSURL * fullPath = destinationFolder;
    
-   
+   success = [manager createDirectoryAtPath:[fullPath path]
+                withIntermediateDirectories:NO
+                                 attributes:nil
+                                      error:&error];
+   if (success == YES && error == nil)
+      _extractionURL = fullPath;
+      
    if (_extractionURL == nil)
    {
       [self setErrorCode:ZipErrorCodes.OUZEC_CannotCreateFolder
