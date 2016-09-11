@@ -40,7 +40,7 @@
 #import "ZipWriteStream.h"
 
 
-#define FILE_IN_ZIP_MAX_NAME_LENGTH (256)
+#define FILE_IN_ZIP_MAX_NAME_LENGTH (4096)
 
 
 @implementation ZipFile

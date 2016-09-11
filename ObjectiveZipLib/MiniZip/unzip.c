@@ -939,6 +939,56 @@ local int unz64local_GetCurrentFileInfoInternal(unzFile file, unz_file_info64 *p
                 file_info_internal.aes_compression_method = uL;
             }
 #endif
+            else if (headerid == 0x7075)
+            {
+               // utf8 filename found, use this instead
+               if (filename != NULL)
+               {
+                  if (datasize > 5)
+                  {
+                     // read the version
+                     uint32_t data = 0;
+                     if (ZREAD64(s->z_filefunc, s->filestream_with_CD, &data, 1) != 1)
+                        err = UNZ_ERRNO;
+                     
+                     datasize -= 1;
+                     
+                     // version of this extra field - currently 1
+                     if (data == 1)
+                     {
+                        // next 4 bytes are a CRC32 checksum of the utf8 filename
+                        data = 0;
+                        if (ZREAD64(s->z_filefunc, s->filestream_with_CD, &data, 4) != 4)
+                           err = UNZ_ERRNO;
+                        
+                        datasize -= 4;
+                        
+                        if (datasize > 0 && datasize < filename_size)
+                        {
+                           if (datasize < filename_size)
+                           {
+                              *(filename + datasize) = 0;
+                              bytes_to_read = datasize;
+                           }
+                           else
+                              bytes_to_read = filename_size;
+                           
+                           if (bytes_to_read > 0)
+                              if (ZREAD64(s->z_filefunc, s->filestream_with_CD, filename, (uLong)bytes_to_read) != bytes_to_read)
+                                 err = UNZ_ERRNO;
+                           
+                           if (err == UNZ_OK)
+                           {
+                              // we could calculate the CRC32 checksum of the utf8 filename and
+                              // verify it matches the CRC32 checksum stored in 'data'
+                           }
+                              
+                           datasize -= (uLong)bytes_to_read;
+                        }
+                     }
+                  }
+               }
+            }
             else
             {
                 if (ZSEEK64(s->z_filefunc, s->filestream_with_CD,datasize, ZLIB_FILEFUNC_SEEK_CUR) != 0)
