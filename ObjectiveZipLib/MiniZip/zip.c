@@ -1143,7 +1143,9 @@ extern int ZEXPORT zipOpenNewFileInZip4_64(zipFile file, const char* filename, c
         *(zi->ci.central_header+SIZECENTRALHEADER+size_filename+size_extrafield_global+extra_size) = *(&version);
         extra_size += 1;
 
-        uint32_t crc = 0;
+        // calculate a checksum of the filename
+        uint32_t crc = crc32(0L, Z_NULL, 0);
+        crc = crc32(crc, filename, size_filename);
         pData = &crc;
         for (i = 0; i < 4; ++i)
             *(zi->ci.central_header+SIZECENTRALHEADER+size_filename+size_extrafield_global+extra_size+i) = *(pData+i);
@@ -1278,7 +1280,7 @@ extern int ZEXPORT zipOpenNewFileInZip4_64(zipFile file, const char* filename, c
          // write out the utf8 extended information
          // write the header magic
          short data = UTF8_FILENAME_MAGIC;
-         if (ZWRITE64(zi->z_filefunc, zi->filestream, &data, 2) != 2)
+         if (ZWRITE64(zi->z_filefunc, zi->filestream, &data, sizeof(data)) != sizeof(data))
             err = ZIP_ERRNO;
          
          // write the data size
@@ -1300,9 +1302,10 @@ extern int ZEXPORT zipOpenNewFileInZip4_64(zipFile file, const char* filename, c
          // write the crc
          if (err == ZIP_OK)
          {
-            // calculate the crcc32 or zero if crc is unknown
-            uint32_t crc32 = 0;
-            if (ZWRITE64(zi->z_filefunc, zi->filestream, &crc32, sizeof(crc32)) != sizeof(crc32))
+            // calculate a checksum of the filename
+            uint32_t crc = crc32(0L, Z_NULL, 0);
+            crc = crc32(crc, filename, size_filename);
+            if (ZWRITE64(zi->z_filefunc, zi->filestream, &crc, sizeof(crc)) != sizeof(crc))
                err = ZIP_ERRNO;
          }
          
