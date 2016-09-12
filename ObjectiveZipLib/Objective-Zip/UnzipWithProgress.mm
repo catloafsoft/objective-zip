@@ -270,11 +270,7 @@
       return NO;
    NSLog(@"Exists and is folder\n");
    
-   NSString * tmpString = [folderToUnzipTo path];
-   if (![tmpString hasSuffix:NEVER_TRANSLATE(@"/")])
-      tmpString = [tmpString stringByAppendingString:NEVER_TRANSLATE(@"/")];
-   NSLog(@"Testing if we can write to %@", tmpString);
-   return [manager isWritableFileAtPath:tmpString];
+   return [manager isWritableFileAtPath:[folderToUnzipTo path]];
 }
 
 - (BOOL) insureAdequateDiskSpace:(NSURL *)folderToUnzipTo
