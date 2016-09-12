@@ -60,9 +60,12 @@
 - (BOOL) canUnzipToLocation:(NSURL *)unzipToFolder;
 {
    if (![self insureRequiredFilesExist:_zipRequiredFiles]) return NO;
+   NSLog(@"requiedfilesexist");
    if ( [self totalDstinationFileSize] == 0) return NO;
-   if (![self insureCanUnzipToLocation:unzipToFolder]) return NO;
+   NSLog(@"destination files not 0");
+//   if (![self insureCanUnzipToLocation:unzipToFolder]) return NO;
    if (![self insureAdequateDiskSpace:unzipToFolder]) return NO;
+   NSLog(@"adequate disk space");
 
    return YES;
 }
