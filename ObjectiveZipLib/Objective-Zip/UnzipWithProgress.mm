@@ -61,7 +61,6 @@
 {
    if (![self insureRequiredFilesExist:_zipRequiredFiles]) return NO;
    if ( [self totalDstinationFileSize] == 0) return NO;
-   if (![self insureCanUnzipToLocation:unzipToFolder]) return NO;
    if (![self insureAdequateDiskSpace:unzipToFolder]) return NO;
 
    return YES;
@@ -262,13 +261,11 @@
 
 - (BOOL) insureCanUnzipToLocation:(NSURL *)folderToUnzipTo
 {
-   NSLog(@"insureCanUnzipToLocation: %@", folderToUnzipTo);
    NSFileManager * manager = [NSFileManager defaultManager];
    BOOL isFolder = NO;
    BOOL success = [manager fileExistsAtPath:[folderToUnzipTo path] isDirectory:&isFolder];
    if (success == NO || isFolder == NO)
       return NO;
-   NSLog(@"Exists and is folder\n");
    
    return [manager isWritableFileAtPath:[folderToUnzipTo path]];
 }
