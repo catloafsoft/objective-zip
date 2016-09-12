@@ -60,12 +60,9 @@
 - (BOOL) canUnzipToLocation:(NSURL *)unzipToFolder;
 {
    if (![self insureRequiredFilesExist:_zipRequiredFiles]) return NO;
-   NSLog(@"requiedfilesexist");
    if ( [self totalDstinationFileSize] == 0) return NO;
-   NSLog(@"destination files not 0");
-//   if (![self insureCanUnzipToLocation:unzipToFolder]) return NO;
+   if (![self insureCanUnzipToLocation:unzipToFolder]) return NO;
    if (![self insureAdequateDiskSpace:unzipToFolder]) return NO;
-   NSLog(@"adequate disk space");
 
    return YES;
 }
@@ -265,16 +262,18 @@
 
 - (BOOL) insureCanUnzipToLocation:(NSURL *)folderToUnzipTo
 {
+   NSLog(@"insureCanUnzipToLocation: %@", folderToUnzipTo);
    NSFileManager * manager = [NSFileManager defaultManager];
    BOOL isFolder = NO;
    BOOL success = [manager fileExistsAtPath:[folderToUnzipTo path] isDirectory:&isFolder];
    if (success == NO || isFolder == NO)
       return NO;
+   NSLog(@"Exists and is folder\n");
    
    NSString * tmpString = [folderToUnzipTo path];
    if (![tmpString hasSuffix:NEVER_TRANSLATE(@"/")])
       tmpString = [tmpString stringByAppendingString:NEVER_TRANSLATE(@"/")];
-   
+   NSLog(@"Testing if we can write to %@", tmpString);
    return [manager isWritableFileAtPath:tmpString];
 }
 
