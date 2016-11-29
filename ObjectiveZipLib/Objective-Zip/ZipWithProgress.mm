@@ -234,17 +234,13 @@
       return NO;
    }
    
-   NSString * tmpString = [folder path];
-   if (![tmpString hasSuffix:NEVER_TRANSLATE(@"/")])
-      tmpString = [tmpString stringByAppendingString:NEVER_TRANSLATE(@"/")];
-   
-   if ([manager isWritableFileAtPath:tmpString] == NO)
-   {
-      [self setErrorCode:ZipErrorCodes.OZEC_ZipLocationReadOnly
-            errorMessage:ZipErrorCodes.OZEM_ZipLocationReadOnly
-               andNotify:YES];
-      return NO;
-   }
+//   if ([manager isWritableFileAtPath:[_zipFileURL path]] == NO)
+//   {
+//      [self setErrorCode:ZipErrorCodes.OZEC_ZipLocationReadOnly
+//            errorMessage:ZipErrorCodes.OZEM_ZipLocationReadOnly
+//               andNotify:YES];
+//      return NO;
+//   }
    
    return YES;
 }

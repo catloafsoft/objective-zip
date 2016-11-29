@@ -29,10 +29,7 @@
 - (BOOL) unzipOneFile:(NSString *)fileNameInArchive toLocation:(NSURL *)unzipToFolder;
 
 - (BOOL) canUnzipToLocation:(NSURL *)unzipToFolder;
-- (void) unzipToLocation:(NSURL *)unzipToFolder
-     withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion;
-- (void) unzipToLocation:(NSURL *)unzipToFolder
-          withFolderName:(NSString *)folderName
+- (void) unzipToURL:(NSURL *) destinationFolder
      withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion;
 
 @end

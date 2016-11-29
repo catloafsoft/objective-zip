@@ -61,7 +61,6 @@
 {
    if (![self insureRequiredFilesExist:_zipRequiredFiles]) return NO;
    if ( [self totalDstinationFileSize] == 0) return NO;
-   if (![self insureCanUnzipToLocation:unzipToFolder]) return NO;
    if (![self insureAdequateDiskSpace:unzipToFolder]) return NO;
 
    return YES;
@@ -117,11 +116,11 @@
    return result;
 }
 
-- (BOOL) createUnZipFolderAtURL:(NSURL *)unzipToFolder withFolderName:(NSString*)folderName
+- (BOOL) createUnZipFolderAtURL:(NSURL *)destinationFolder
 {
    NSFileManager * manager = [NSFileManager defaultManager];
    BOOL isFolder = NO;
-   BOOL success = [manager fileExistsAtPath:[unzipToFolder path] isDirectory:&isFolder];
+   BOOL success = [manager fileExistsAtPath:[[destinationFolder URLByDeletingLastPathComponent] path] isDirectory:&isFolder];
    if (success == NO || isFolder == NO)
    {
       [self setErrorCode:ZipErrorCodes.OUZEC_PathDoesNotExist
@@ -132,40 +131,17 @@
    
    if (_extractionURL) _extractionURL = nil;
    
-   NSString *folderPart;
-   if (folderName && ![folderName isEqualToString:@""])
-   {
-      folderPart = folderName;
-   }
-   else
-   {
-      NSString *pathOfNewFolder = [[_zipFileURL URLByDeletingPathExtension] path];
-      folderPart = [pathOfNewFolder lastPathComponent];
-   }
+   NSError * error = nil;
 
-   unsigned loopCount = 1;
+   NSURL * fullPath = destinationFolder;
    
-   do
-   {
-      NSError * error = nil;
-      NSString * folder =
-         (loopCount > 1)? [NSString stringWithFormat:NEVER_TRANSLATE(@"%@ %u"), folderPart, loopCount]
-                        : folderPart;
+   success = [manager createDirectoryAtPath:[fullPath path]
+                withIntermediateDirectories:NO
+                                 attributes:nil
+                                      error:&error];
+   if (success == YES && error == nil)
+      _extractionURL = fullPath;
       
-      NSURL * fullPath = [unzipToFolder URLByAppendingPathComponent:folder isDirectory:YES];
-      
-      success = [manager createDirectoryAtPath:[fullPath path]
-                   withIntermediateDirectories:NO
-                                    attributes:nil
-                                         error:&error];
-      if (success == NO || error != nil)
-         ++loopCount;
-      else
-         _extractionURL = fullPath;
-      
-   } while (_extractionURL == nil && loopCount < 1000);
-   
-   
    if (_extractionURL == nil)
    {
       [self setErrorCode:ZipErrorCodes.OUZEC_CannotCreateFolder
@@ -177,15 +153,15 @@
    return YES;
 }
 
-- (void) unzipToLocation:(NSURL *)unzipToFolder withFolderName:(NSString *)folderName
+- (void) unzipToURL:(NSURL *)destinationFolder
 {
    if (![self prepareForOperation]) return;
    
    if (self.cancelOperation) return [self setCancelErrorAndCleanup];
    
-   if ([self createUnZipFolderAtURL:unzipToFolder withFolderName:folderName] == NO) return;
+   if ([self createUnZipFolderAtURL:destinationFolder] == NO) return;
                            
-   if ([self insureAdequateDiskSpace:unzipToFolder] == NO)  return;
+   if ([self insureAdequateDiskSpace:destinationFolder] == NO)  return;
    
    [_zipTool goToFirstFileInZip];
    
@@ -212,8 +188,7 @@
    } while ([_zipTool goToNextFileInZip]);
 }
 
-- (void) unzipToLocation:(NSURL *)unzipToFolder
-          withFolderName:(NSString *)folderName
+- (void) unzipToURL:(NSURL *)destinationFolder
      withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion
 {
    self.cancelOperation = NO;
@@ -223,7 +198,7 @@
    {
       dispatch_async(queue,
                      ^{
-                        [self unzipToLocation:unzipToFolder withFolderName:folderName];
+                        [self unzipToURL:destinationFolder];
                         [self performZipToolCleanup];
                         if (completion) completion(_extractionURL, _zipFileError);
                      });
@@ -240,13 +215,6 @@
       if (completion) completion(_extractionURL, _zipFileError);
    }
 }
-
-- (void) unzipToLocation:(NSURL *)unzipToFolder
-     withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion
-{
-   [self unzipToLocation:unzipToFolder withFolderName:nil withCompletionBlock:completion];
-}
-
 
 #pragma mark helpers
 
@@ -299,11 +267,7 @@
    if (success == NO || isFolder == NO)
       return NO;
    
-   NSString * tmpString = [folderToUnzipTo path];
-   if (![tmpString hasSuffix:NEVER_TRANSLATE(@"/")])
-      tmpString = [tmpString stringByAppendingString:NEVER_TRANSLATE(@"/")];
-   
-   return [manager isWritableFileAtPath:tmpString];
+   return [manager isWritableFileAtPath:[folderToUnzipTo path]];
 }
 
 - (BOOL) insureAdequateDiskSpace:(NSURL *)folderToUnzipTo
