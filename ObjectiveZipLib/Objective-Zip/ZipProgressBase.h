@@ -23,7 +23,7 @@
    NSError *            _zipFileError;
    ZipFile *            _zipTool;
    
-   id<ProgressDelegate> _zipDelegate;
+   __weak id<ProgressDelegate> _zipDelegate;
    
    unsigned long long   _totalFileSize;
    unsigned long long   _totalDestinationBytesWritten;
