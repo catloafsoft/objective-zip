@@ -310,15 +310,23 @@
 {
    BOOL result = NO;
    
-   NSURL * fullUrl = [unzipToFolder URLByAppendingPathComponent:info.name];
+   NSURL * fullURL = [unzipToFolder URLByAppendingPathComponent:info.name];
    
    if ([_zipDelegate respondsToSelector:@selector(updateCurrentFile:)])
-      [_zipDelegate  updateCurrentFile:fullUrl];
+      [_zipDelegate  updateCurrentFile:fullURL];
    
    // create an empty file - don't overwrite an existing file
    NSError * error = nil;
+   
+   NSURL * parentURL = [fullURL URLByDeletingLastPathComponent];
+   NSFileManager * fileManager = [NSFileManager defaultManager];
+   
+   if ( ![fileManager fileExistsAtPath:parentURL.path] )
+   {
+      [fileManager createDirectoryAtURL:parentURL withIntermediateDirectories:YES attributes:nil error:&error];
+   }
    NSData * emptyData = [NSData new];
-   BOOL success = [emptyData writeToURL:fullUrl
+   BOOL success = [emptyData writeToURL:fullURL
                                 options:NSDataWritingWithoutOverwriting
                                   error:&error];
    
@@ -330,11 +338,11 @@
       return result;
    }
    
-   [self addToFilesCreated:fullUrl];
+   [self addToFilesCreated:fullURL];
    
    // open a file handle for writing to the file
    error = nil;
-   NSFileHandle * handle = [NSFileHandle fileHandleForWritingToURL:fullUrl  error:&error];
+   NSFileHandle * handle = [NSFileHandle fileHandleForWritingToURL:fullURL  error:&error];
    if (handle == nil || error != nil)
    {
       [self setErrorCode:ZipErrorCodes.OUZEC_FileCouldNotBeOpenedForWriting
@@ -356,7 +364,7 @@
    unsigned long  bytesToRead = 1024 * 64; // read/write 64k at a time
    
    [self updateProgress:totalBytesWritten
-             forFileURL:fullUrl
+             forFileURL:fullURL
            withFileInfo:info
          singleFileOnly:singleFileOnly];
    
@@ -375,7 +383,7 @@
          _totalDestinationBytesWritten += data.length;
          
          [self updateProgress:totalBytesWritten
-                   forFileURL:fullUrl
+                   forFileURL:fullURL
                  withFileInfo:info
                singleFileOnly:singleFileOnly];
          
