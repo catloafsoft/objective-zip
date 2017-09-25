@@ -169,14 +169,24 @@
    {
       FileInZipInfo * info = [_zipTool getCurrentFileInZipInfo];
       
-      ZipReadStream * readStream = [_zipTool readCurrentFileInZip];
-      
-      [self extractStream:readStream
-                 toFolder:_extractionURL
-                 withInfo:info
-           singleFileOnly:NO];
-      
-      [readStream finishedReading];
+      if ( !self.unzipFileDelegate || [self.unzipFileDelegate includeFileWithName:info.name] )
+      {
+         ZipReadStream * readStream = [_zipTool readCurrentFileInZip];
+         
+         [self extractStream:readStream
+                    toFolder:_extractionURL
+                    withInfo:info
+              singleFileOnly:NO];
+         
+         [readStream finishedReading];
+      }
+      else
+      {
+         [self updateProgress:info.length
+                   forFileURL:nil
+                 withFileInfo:info
+               singleFileOnly:NO];
+      }
       
       if (_zipFileError != nil) break;
       if (self.cancelOperation)
