@@ -10,5 +10,5 @@
 
 @protocol UnzipFileDelegate <NSObject>
 @required
-- (BOOL) includeFileWithName:(NSString *) filename;
+- (BOOL) includeFileWithName:(NSString *) filename error:(NSError * __autoreleasing * ) error;
 @end

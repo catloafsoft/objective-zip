@@ -169,7 +169,8 @@
    {
       FileInZipInfo * info = [_zipTool getCurrentFileInZipInfo];
       
-      if ( !self.unzipFileDelegate || [self.unzipFileDelegate includeFileWithName:info.name] )
+      NSError * error  = nil;
+      if ( !self.unzipFileDelegate || [self.unzipFileDelegate includeFileWithName:info.name error:&error] )
       {
          ZipReadStream * readStream = [_zipTool readCurrentFileInZip];
          
@@ -187,7 +188,10 @@
                  withFileInfo:info
                singleFileOnly:NO];
       }
-      
+      if ( error != nil )
+      {
+         _zipFileError = error;
+      }
       if (_zipFileError != nil) break;
       if (self.cancelOperation)
       {
