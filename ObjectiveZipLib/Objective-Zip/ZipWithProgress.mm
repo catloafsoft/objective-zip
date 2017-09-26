@@ -106,9 +106,18 @@
    {
       dispatch_async(queue,
                      ^{
-                        [self createZipFile];
-                        [self performZipToolCleanup];
-                        if (completion) completion(_zipFileError);
+                        @try
+                        {
+                           [self createZipFile];
+                           [self performZipToolCleanup];
+                        }
+                        @catch (NSException *exception)
+                        {
+                        }
+                        @finally
+                        {
+                           if (completion) completion(_zipFileError);
+                        }
                      });
    }
    else
