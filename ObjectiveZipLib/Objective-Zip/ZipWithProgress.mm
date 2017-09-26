@@ -113,6 +113,12 @@
                         }
                         @catch (NSException *exception)
                         {
+                           if ( _zipFileError == nil )
+                           {
+                              [self setErrorCode:ZipErrorCodes.OZCEC_Indeterminate
+                                    errorMessage:ZipErrorCodes.OZCEM_Indeterminate
+                                       andNotify:NO];
+                           }
                         }
                         @finally
                         {
