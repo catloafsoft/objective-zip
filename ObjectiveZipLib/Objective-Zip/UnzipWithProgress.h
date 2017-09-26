@@ -5,6 +5,7 @@
 #import <Foundation/Foundation.h>
 
 #import "ProgressDelegate.h"
+#import "UnzipFileDelegate.h"
 #import "ZipProgressBase.h"
 
 #include <map>
@@ -31,5 +32,8 @@
 - (BOOL) canUnzipToLocation:(NSURL *)unzipToFolder;
 - (void) unzipToURL:(NSURL *) destinationFolder
      withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion;
+
+
+@property (weak) NSObject<UnzipFileDelegate> * unzipFileDelegate;
 
 @end
