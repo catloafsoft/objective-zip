@@ -106,9 +106,24 @@
    {
       dispatch_async(queue,
                      ^{
-                        [self createZipFile];
-                        [self performZipToolCleanup];
-                        if (completion) completion(_zipFileError);
+                        @try
+                        {
+                           [self createZipFile];
+                           [self performZipToolCleanup];
+                        }
+                        @catch (NSException *exception)
+                        {
+                           if ( _zipFileError == nil )
+                           {
+                              [self setErrorCode:ZipErrorCodes.OZCEC_Indeterminate
+                                    errorMessage:ZipErrorCodes.OZCEM_Indeterminate
+                                       andNotify:NO];
+                           }
+                        }
+                        @finally
+                        {
+                           if (completion) completion(_zipFileError);
+                        }
                      });
    }
    else
