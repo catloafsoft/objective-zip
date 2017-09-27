@@ -78,8 +78,10 @@
 {
    if (_zipTool)
    {
-      [_zipTool close];
+      // make sure we only ever call close once.  close can throw, leaving us in a weird state.
+      ZipFile * tempZipTool = _zipTool;
       _zipTool = nil;
+      [tempZipTool close];
    }
 }
 
