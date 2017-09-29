@@ -20,6 +20,7 @@
 {
    NSArray * _zipRequiredFiles;
    NSURL *   _extractionURL;
+   BOOL      _createNewFolder;
 }
 
 @end
@@ -37,6 +38,7 @@
    if (self = [super initWithZipFile:zipFileURL forMode:ZipFileModeUnzip withDelegate:delegate])
    {
       _zipRequiredFiles = requiredFiles;
+      _createNewFolder = YES;
    }
    
    return self;
@@ -69,6 +71,8 @@
 - (BOOL) unzipOneFile:(NSString *)fileName toLocation:(NSURL *)unzipToFolder
 {
    static const unsigned long long s_freeSpaceBuffer = 1024 * 1000 * 10; // 10 MB buffer min disk space
+   
+   _createNewFolder = YES;
    
    BOOL result = NO;
    
@@ -159,8 +163,16 @@
    
    if (self.cancelOperation) return [self setCancelErrorAndCleanup];
    
-   if ([self createUnZipFolderAtURL:destinationFolder] == NO) return;
-                           
+   // if no file delegate, use default behavior of creating a root folder
+   if ( _createNewFolder )
+   {
+      if ([self createUnZipFolderAtURL:destinationFolder] == NO) return;
+   }
+   else
+   {
+      _extractionURL = destinationFolder;
+   }
+   
    if ([self insureAdequateDiskSpace:destinationFolder] == NO)  return;
    
    [_zipTool goToFirstFileInZip];
@@ -203,8 +215,10 @@
 }
 
 - (void) unzipToURL:(NSURL *)destinationFolder
+    createNewFolder:(BOOL) createNewFolder
      withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion
 {
+   _createNewFolder = createNewFolder;
    self.cancelOperation = NO;
    
    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -230,6 +244,15 @@
    }
 }
 
+- (void) unzipToURL:(NSURL *)destinationFolder
+withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion
+{
+   [self unzipToURL:destinationFolder
+    createNewFolder:YES
+   withCompletionBlock:completion];
+}
+
+
 #pragma mark helpers
 
 - (void) performFileCleanup
@@ -237,7 +260,7 @@
    // clean up all of the files we have created
    [super performFileCleanup];
    
-   if (_extractionURL)
+   if ( _createNewFolder && _extractionURL )
    {
       NSError * error = nil;
       BOOL result = [[NSFileManager defaultManager] removeItemAtURL:_extractionURL error:&error];

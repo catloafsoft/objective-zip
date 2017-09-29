@@ -31,7 +31,11 @@
 
 - (BOOL) canUnzipToLocation:(NSURL *)unzipToFolder;
 - (void) unzipToURL:(NSURL *) destinationFolder
+    createNewFolder:(BOOL) createNewFolder
      withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion;
+
+- (void) unzipToURL:(NSURL *) destinationFolder
+   withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completion;
 
 
 @property (weak) NSObject<UnzipFileDelegate> * unzipFileDelegate;
