@@ -347,11 +347,18 @@ withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completi
 {
    BOOL result = NO;
    
+   
    NSURL * fullURL = [unzipToFolder URLByAppendingPathComponent:info.name];
    
    if ([_zipDelegate respondsToSelector:@selector(updateCurrentFile:)])
       [_zipDelegate  updateCurrentFile:fullURL];
    
+   // let the delegate modify the file name.  We do this in all cases, because the delegate may have its own ideas aboutwhat a collision is
+   if ( self.unzipFileDelegate )
+   {
+      fullURL = [unzipToFolder URLByAppendingPathComponent:[self.unzipFileDelegate modifiedNameForFileName:info.name]];
+   }
+
    // create an empty file - don't overwrite an existing file
    NSError * error = nil;
    
