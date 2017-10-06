@@ -45,7 +45,18 @@
 
 - (void)dealloc
 {
-   [self performZipToolCleanup];
+   @try
+   {
+      [self performZipToolCleanup];
+   }
+   @catch ( NSException * e )
+   {
+      NSLog(@"Exception thrown deallocing ZipProgressBase %@", e);
+   }
+   @catch ( id )
+   {
+      NSLog(@"Exception thrown deallocing ZipProgressBase");
+   }
 }
 
 - (void) setProgressDelegate:(id<ProgressDelegate>)delegate
