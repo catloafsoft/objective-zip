@@ -90,6 +90,23 @@
 	return self;
 }
 
+-(uLong) dosDateForYear:(uLong) year
+                  month:(uLong) month
+                    day:(uLong) day
+                   hour:(uLong) hour
+                 minute:(uLong) minute
+                second:(uLong) second
+{
+       if (year >= 1980)
+              year -= 1980;
+       else if (year >= 80)
+              year -= 80;
+       return
+         (uLong)(((day) + (32 * (month+1)) + (512 * year)) << 16) |
+           ((second/2) + (32* minute) + (2048 * (uLong)hour));
+}
+
+
 - (ZipWriteStream *) writeFileInZipWithName:(NSString *)fileNameInZip compressionLevel:(ZipCompressionLevel)compressionLevel {
 	if (_mode == ZipFileModeUnzip) {
 		NSString *reason= ZipErrorCodes.OUZEM_OperationNotPermitted;
@@ -103,15 +120,9 @@
                                                  NSCalendarUnitMonth | NSCalendarUnitYear)
                                        fromDate:now];
 	zip_fileinfo zi;
-	zi.tmz_date.tm_sec= (uInt)[date second];
-	zi.tmz_date.tm_min= (uInt)[date minute];
-	zi.tmz_date.tm_hour= (uInt)[date hour];
-	zi.tmz_date.tm_mday= (uInt)[date day];
-	zi.tmz_date.tm_mon= (uInt)[date month] -1;
-	zi.tmz_date.tm_year= (uInt)[date year];
 	zi.internal_fa= 0;
 	zi.external_fa= 0;
-	zi.dosDate= 0;
+	zi.dos_date= (uint32_t) [self dosDateForYear:[date year] month:[date month]-1 day:[date day] hour:[date hour] minute:[date minute] second:[date second]];
 	
    int err= zipOpenNewFileInZip3_64(_zipFile,
                                     [fileNameInZip cStringUsingEncoding:NSUTF8StringEncoding],
@@ -139,15 +150,9 @@
 	NSCalendar *calendar= [NSCalendar currentCalendar];
 	NSDateComponents *date= [calendar components:(NSCalendarUnitSecond | NSCalendarUnitMinute | NSCalendarUnitHour | NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear) fromDate:fileDate];
 	zip_fileinfo zi;
-	zi.tmz_date.tm_sec= (uInt)[date second];
-	zi.tmz_date.tm_min= (uInt)[date minute];
-	zi.tmz_date.tm_hour= (uInt)[date hour];
-	zi.tmz_date.tm_mday= (uInt)[date day];
-	zi.tmz_date.tm_mon= (uInt)[date month] -1;
-	zi.tmz_date.tm_year= (uInt)[date year];
 	zi.internal_fa= 0;
 	zi.external_fa= 0;
-	zi.dosDate= 0;
+   zi.dos_date= (uint32_t) [self dosDateForYear:[date year] month:[date month]-1 day:[date day] hour:[date hour] minute:[date minute] second:[date second]];
 	
    int err= zipOpenNewFileInZip3_64(_zipFile,
                                     [fileNameInZip cStringUsingEncoding:NSUTF8StringEncoding],
@@ -175,15 +180,9 @@
 	NSCalendar *calendar= [NSCalendar currentCalendar];
 	NSDateComponents *date= [calendar components:(NSCalendarUnitSecond | NSCalendarUnitMinute | NSCalendarUnitHour | NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear) fromDate:fileDate];
 	zip_fileinfo zi;
-	zi.tmz_date.tm_sec= (uInt)[date second];
-	zi.tmz_date.tm_min= (uInt)[date minute];
-	zi.tmz_date.tm_hour= (uInt)[date hour];
-	zi.tmz_date.tm_mday= (uInt)[date day];
-	zi.tmz_date.tm_mon= (uInt)[date month] -1;
-	zi.tmz_date.tm_year= (uInt)[date year];
 	zi.internal_fa= 0;
 	zi.external_fa= 0;
-	zi.dosDate= 0;
+   zi.dos_date= (uint32_t) [self dosDateForYear:[date year] month:[date month]-1 day:[date day] hour:[date hour] minute:[date minute] second:[date second]];
 	
    int err= zipOpenNewFileInZip3_64(_zipFile,
                                     [fileNameInZip cStringUsingEncoding:NSUTF8StringEncoding],
@@ -327,12 +326,12 @@
 	BOOL crypted= ((file_info.flag & 1) != 0);
 	
 	NSDateComponents *components= [[NSDateComponents alloc] init];
-	[components setDay:file_info.tmu_date.tm_mday];
-	[components setMonth:file_info.tmu_date.tm_mon +1];
-	[components setYear:file_info.tmu_date.tm_year];
-	[components setHour:file_info.tmu_date.tm_hour];
-	[components setMinute:file_info.tmu_date.tm_min];
-	[components setSecond:file_info.tmu_date.tm_sec];
+//	[components setDay:file_info.tmu_date.tm_mday];
+//	[components setMonth:file_info.tmu_date.tm_mon +1];
+//	[components setYear:file_info.tmu_date.tm_year];
+//	[components setHour:file_info.tmu_date.tm_hour];
+//	[components setMinute:file_info.tmu_date.tm_min];
+//	[components setSecond:file_info.tmu_date.tm_sec];
 	NSCalendar *calendar= [NSCalendar currentCalendar];
 	NSDate *date= [calendar dateFromComponents:components];
 	
