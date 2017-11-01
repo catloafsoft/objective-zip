@@ -405,7 +405,7 @@ withCompletionBlock:(void(^)(NSURL * extractionFolder, NSError * error))completi
    }
    
    unsigned long long totalBytesWritten = 0;
-   unsigned long  bytesToRead = 1024 * 64; // read/write 64k at a time
+   unsigned long  bytesToRead = 1024 * 63; // read/write 63k at a time.  64k chunks are not supported.
    
    [self updateProgress:totalBytesWritten
              forFileURL:fullURL
