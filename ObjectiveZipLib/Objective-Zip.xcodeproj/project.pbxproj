@@ -188,11 +188,11 @@
 			};
 			buildConfigurationList = EAA4E3B514FD56B70025B561 /* Build configuration list for PBXProject "Objective-Zip" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
+				Base,
 			);
 			mainGroup = EAA4E3B014FD56B70025B561;
 			productRefGroup = EAA4E3BC14FD56B70025B561 /* Products */;
