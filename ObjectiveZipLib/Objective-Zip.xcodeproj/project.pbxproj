@@ -183,7 +183,7 @@
 		EAA4E3B214FD56B70025B561 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1220;
+				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = "";
 			};
 			buildConfigurationList = EAA4E3B514FD56B70025B561 /* Build configuration list for PBXProject "Objective-Zip" */;
